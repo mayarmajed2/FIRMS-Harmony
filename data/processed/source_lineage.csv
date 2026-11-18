@@ -1,0 +1,6 @@
+﻿archive,processing,version,rows_in_delta,first_acq_date,last_acq_date,satellite_codes
+modis,SP,6.03,1889,2018-01-03,2022-12-29,Aqua|Terra
+modis,SP,6.2,11508,2000-11-02,2017-12-30,Aqua|Terra
+modis,SP,61.03,1580,2023-01-05,2025-12-31,Aqua|Terra
+viirs-jpss1,SP,2,70745,2018-04-01,2025-12-31,N20
+viirs-snpp,SP,2,138693,2012-01-20,2025-12-31,N

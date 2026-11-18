@@ -55,6 +55,7 @@
 <script src="../js/utils.js"></script>
 <script src="../js/i18n.js"></script>
 <script src="../js/data.js"></script>
+<script src="../js/verified-firms-data.js"></script>
 <script src="../js/hero.js"></script>
 <script src="../js/home.js"></script>
 <script src="../js/map.js"></script>
@@ -274,6 +275,22 @@
     loadCustomFIRMS(big);
     assert($('analytics').querySelectorAll('svg').length >= 3, 'All 3 analytics SVG charts should render');
     resetToBenchmark();
+  });
+
+  /* ── 10. Integrated Verified NASA FIRMS Archive (2000–2025) ── */
+  test('VERIFIED_FIRMS real archive dataset is loaded with 74 files and 2000–2025 coverage', () => {
+    assert(typeof VERIFIED_FIRMS === 'object' && VERIFIED_FIRMS !== null, 'VERIFIED_FIRMS should be defined');
+    assertEqual(VERIFIED_FIRMS.totalArchiveFiles, 74, 'Should reflect 74 verified NASA FIRMS archive files');
+    assertEqual(VERIFIED_FIRMS.coverage.length, 4, 'Should cover 4 platforms (Terra, Aqua, S-NPP, NOAA-20)');
+    assertEqual(VERIFIED_FIRMS.harmonizedYearly.length, 26, 'Should cover 26 years (2000–2025)');
+  });
+
+  test('Verified out-of-sample calibration improves Terra & Aqua MAE by >50% and renders SVG', () => {
+    const terra = VERIFIED_FIRMS.calibrationBaseline.find(r => r.source === 'terra');
+    const aqua = VERIFIED_FIRMS.calibrationBaseline.find(r => r.source === 'aqua');
+    assert(terra && terra.maeAdjusted < terra.maeRaw * 0.5, 'Terra MAE should improve by >50%');
+    assert(aqua && aqua.maeAdjusted < aqua.maeRaw * 0.5, 'Aqua MAE should improve by >50%');
+    assert($('an-verified-chart') && $('an-verified-chart').querySelector('svg'), 'Verified harmonized SVG chart should render');
   });
 
   /* ── Render Results ── */

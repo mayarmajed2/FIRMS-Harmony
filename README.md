@@ -8,7 +8,8 @@
   [![JavaScript ES6+](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
   [![Leaflet 1.9.4](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
   [![Bilingual](https://img.shields.io/badge/i18n-EN%20%7C%20AR%20RTL-1f7a78?style=for-the-badge)](docs/USER_GUIDE.md#language-and-rtl-support)
-  [![Tests](https://img.shields.io/badge/Tests-19%20Passing-3cc9b6?style=for-the-badge)](tests/index.html)
+  [![Tests](https://img.shields.io/badge/Tests-21%20Passing-3cc9b6?style=for-the-badge)](tests/index.html)
+  [![Verified Archive](https://img.shields.io/badge/NASA%20FIRMS-2000--2025%20(74%20Files)-f08a3c?style=for-the-badge)](data/processed/coverage_summary.csv)
   [![Zero Build](https://img.shields.io/badge/Build-Zero%20Dependencies-ff5a4a?style=for-the-badge)](docs/INSTALLATION.md)
 
   <p>
@@ -71,6 +72,11 @@ Long-term wildfire and agricultural burning studies routinely span more than two
 - **🛰️ Sensor Physics & Scientific Methodology Views (`#sensors`, `#methodology`)**
   - Side-by-side MODIS vs. VIIRS instrument specifications, overlap bar chart, and sub-pixel resolution geometry diagram.
   - Six-stage SVG data processing pipeline, FRP radiometric formulation (Wooster et al., 2003), peer-reviewed citations, and explicit scientific limitations disclosure.
+
+- **🛰️ Integrated Real NASA FIRMS Egypt Archive & Python Pipeline (2000–2025)**
+  - Includes real, out-of-sample validated processed outputs from **74 official NASA FIRMS annual archive files** (`Terra`, `Aqua`, `VIIRS S-NPP`, `VIIRS NOAA-20`, spanning `2000-11` to `2025-12`) under [`data/processed/`](data/processed/).
+  - Reproducible Python ETL & validation pipeline in [`pipeline/firms_pipeline.py`](pipeline/firms_pipeline.py) and [`pipeline/app.py`](pipeline/app.py).
+  - Rendered live inside `#analytics` via [`js/verified-firms-data.js`](js/verified-firms-data.js): continuous `2001–2025` raw vs. harmonized VIIRS-equivalent SVG series and 36-month held-out MAE/bias validation (`Terra` MAE `-54.4%`, `Aqua` MAE `-54.5%`).
 
 - **🌐 Bilingual Interface (English LTR & Arabic RTL)**
   - Instant switching between English (`en`, `dir="ltr"`) and Arabic (`ar`, `dir="rtl"`) with `localStorage` persistence (`fh-lang`), Cairo Arabic typography, and mirrored RTL layout controls.
@@ -174,10 +180,16 @@ FIRMS-Harmony/
 │   └── nile-night.jpg          # NASA Earth Observatory nighttime Nile backdrop
 ├── css/
 │   └── styles.css              # Design tokens, layout, responsive & RTL styles
+├── data/
+│   └── processed/              # Real NASA FIRMS Egypt (2000–2025) validated CSV outputs
+├── pipeline/
+│   ├── firms_pipeline.py       # Python ETL, spatial clipping & out-of-sample calibration pipeline
+│   └── app.py                  # Python API/dashboard server for local pipeline exploration
 ├── js/
-│   ├── utils.js                # Shared DOM selector helper ($)
+│   ├── utils.js                # Shared DOM, HTML-escaping & CSV-sanitization helpers
 │   ├── i18n.js                 # EN/AR dictionary, RTL switcher & langchange event
 │   ├── data.js                 # Nile polygon, benchmark generator, FIRMS CSV parser & calibration
+│   ├── verified-firms-data.js  # Real 2000–2025 NASA FIRMS harmonized archive data for SPA
 │   ├── hero.js                 # Animated abstract Nile SVG illustration
 │   ├── home.js                 # Dynamic Home KPI counters
 │   ├── map.js                  # Leaflet GIS map, filters, time-lapse & CSV export

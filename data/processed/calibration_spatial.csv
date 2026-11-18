@@ -1,0 +1,16 @@
+﻿area_id,area_name,bounds,source,train_months,test_months,factor,mae_raw,mae_adjusted,bias_raw,bias_adjusted,status
+full,Full Nile Delta,"29.5,29.8,32.5,31.65",terra,120,36,18.389316,309.75,141.17,-309.75,-17.51,mae_improved
+full,Full Nile Delta,"29.5,29.8,32.5,31.65",aqua,120,36,19.226473,308.67,140.32,-308.67,17.38,mae_improved
+full,Full Nile Delta,"29.5,29.8,32.5,31.65",noaa20,48,36,1.014572,28.86,30.43,14.03,18.99,mae_not_improved
+west,Western Delta,"29.5,29.8,31.0,31.65",terra,120,36,14.958791,103.31,52.34,-103.31,20.38,mae_improved
+west,Western Delta,"29.5,29.8,31.0,31.65",aqua,120,36,20.54717,106.72,57.48,-106.72,-0.3,mae_improved
+west,Western Delta,"29.5,29.8,31.0,31.65",noaa20,48,36,0.982799,12.25,11.18,6.19,4.16,mae_improved
+east,Eastern Delta,"31.0,29.8,32.5,31.65",terra,120,36,20.672151,206.44,107.66,-206.44,-50.16,mae_improved
+east,Eastern Delta,"31.0,29.8,32.5,31.65",aqua,120,36,18.649258,201.94,99.66,-201.94,17.69,mae_improved
+east,Eastern Delta,"31.0,29.8,32.5,31.65",noaa20,48,36,1.036459,23.11,25.51,7.83,15.94,mae_not_improved
+south,Southern Delta,"29.5,29.8,32.5,30.7",terra,120,36,16.926981,138.69,66.29,-138.69,32.08,mae_improved
+south,Southern Delta,"29.5,29.8,32.5,30.7",aqua,120,36,32.661512,142.5,117.74,-142.5,76.49,mae_improved
+south,Southern Delta,"29.5,29.8,32.5,30.7",noaa20,48,36,0.98221,19.14,18.21,8.19,5.39,mae_improved
+north,Northern Delta,"29.5,30.7,32.5,31.65",terra,120,36,19.409317,171.06,101.17,-171.06,-59.07,mae_improved
+north,Northern Delta,"29.5,30.7,32.5,31.65",aqua,120,36,15.378445,166.17,66.51,-166.17,-8.4,mae_improved
+north,Northern Delta,"29.5,30.7,32.5,31.65",noaa20,48,36,1.049565,15.67,19.11,5.83,14.9,mae_not_improved

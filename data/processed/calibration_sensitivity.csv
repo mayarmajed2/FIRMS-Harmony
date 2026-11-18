@@ -1,0 +1,7 @@
+﻿metric,source,train_months,test_months,factor,mae_raw,mae_adjusted,bias_raw,bias_adjusted,status
+hotspot_count,terra,120,36,18.389316,309.75,141.17,-309.75,-17.51,mae_improved
+cell_day,terra,120,36,12.916801,153.19,61.48,-153.19,-7.88,mae_improved
+hotspot_count,aqua,120,36,19.226473,308.67,140.32,-308.67,17.38,mae_improved
+cell_day,aqua,120,36,14.487658,153.22,91.43,-153.22,10.88,mae_improved
+hotspot_count,noaa20,48,36,1.014572,28.86,30.43,14.03,18.99,mae_not_improved
+cell_day,noaa20,48,36,0.968757,17.81,15.5,12.47,6.92,mae_improved

@@ -380,6 +380,109 @@
     return svg;
   }
 
+  /* ───── Chart 4: Verified NASA FIRMS Harmonized Series (2001–2025) ───── */
+  function buildVerifiedHarmonizedChart(rows, isAr) {
+    const data = rows.filter(r => r.months >= 12); // Complete years (2001–2025)
+    const pad = { top: 40, right: 30, bottom: 50, left: 60 };
+    const W = 820, H = 310;
+    const cw = W - pad.left - pad.right;
+    const ch = H - pad.top - pad.bottom;
+
+    let maxVal = 100;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].harmonized > maxVal) maxVal = data[i].harmonized;
+      if (data[i].raw > maxVal) maxVal = data[i].raw;
+    }
+
+    const svg = svgEl('svg', {
+      viewBox: `0 0 ${W} ${H}`,
+      role: 'img',
+      'aria-label': isAr
+        ? 'السلسلة الزمنية الموثقة والمنسقة من أرشيف NASA FIRMS لمصر (2001–2025)'
+        : 'Verified NASA FIRMS Egypt raw vs harmonized annual hotspots (2001–2025)',
+      style: 'width:100%;height:auto;display:block;font-family:inherit;'
+    });
+
+    for (let s = 0; s <= 4; s++) {
+      const yVal = Math.round((s / 4) * maxVal);
+      const yPos = pad.top + ch - (s / 4) * ch;
+      svg.appendChild(svgEl('line', {
+        x1: pad.left, y1: yPos, x2: W - pad.right, y2: yPos,
+        stroke: 'var(--line)', 'stroke-width': '1', 'stroke-dasharray': '3 3'
+      }));
+      svg.appendChild(svgEl('text', {
+        x: pad.left - 10, y: yPos + 4,
+        'text-anchor': 'end', fill: 'var(--smoke)', 'font-size': '10'
+      }, fmt(yVal)));
+    }
+
+    const slotW = cw / data.length;
+    const barW = Math.max(Math.floor(slotW * 0.62), 6);
+
+    // 2012 transition marker
+    const idx2012 = data.findIndex(d => d.year === 2012);
+    if (idx2012 !== -1) {
+      const x2012 = pad.left + idx2012 * slotW;
+      svg.appendChild(svgEl('line', {
+        x1: x2012, y1: pad.top - 10, x2: x2012, y2: pad.top + ch,
+        stroke: 'var(--ember)', 'stroke-width': '1.5', 'stroke-dasharray': '5 4'
+      }));
+      svg.appendChild(svgEl('text', {
+        x: x2012 + 6, y: pad.top + 10,
+        fill: 'var(--ember)', 'font-size': '11', 'font-weight': '600'
+      }, isAr ? '← بدء VIIRS S-NPP (2012)' : 'VIIRS S-NPP direct (2012) →'));
+    }
+
+    // Harmonized continuous line points
+    const linePts = [];
+
+    data.forEach((d, i) => {
+      const cx = pad.left + (i + 0.5) * slotW;
+      const hRaw = (d.raw / maxVal) * ch;
+      const yHarm = pad.top + ch - (d.harmonized / maxVal) * ch;
+      linePts.push(`${cx.toFixed(1)},${yHarm.toFixed(1)}`);
+
+      const barColor = d.year < 2012 ? MODIS_COLOR : VIIRS_COLOR;
+      const rect = svgEl('rect', {
+        x: cx - barW / 2, y: pad.top + ch - hRaw, width: barW, height: Math.max(hRaw, 2),
+        fill: barColor, opacity: '0.45', rx: '2'
+      });
+      rect.appendChild(svgEl('title', {}, `${d.year} Raw (${d.source}): ${fmt(d.raw)} | Harmonized: ${fmt(d.harmonized)}`));
+      svg.appendChild(rect);
+
+      if (d.year % 3 === 0 || d.year === 2001 || d.year === 2012 || d.year === 2025) {
+        svg.appendChild(svgEl('text', {
+          x: cx, y: H - pad.bottom + 20,
+          'text-anchor': 'middle', fill: 'var(--smoke)', 'font-size': '10'
+        }, String(d.year)));
+      }
+    });
+
+    // Harmonized line & nodes
+    svg.appendChild(svgEl('polyline', {
+      points: linePts.join(' '),
+      fill: 'none', stroke: '#3cc9b6', 'stroke-width': '2.5', 'stroke-linejoin': 'round'
+    }));
+    data.forEach((d, i) => {
+      const cx = pad.left + (i + 0.5) * slotW;
+      const cy = pad.top + ch - (d.harmonized / maxVal) * ch;
+      const dot = svgEl('circle', { cx, cy, r: '3.2', fill: '#3cc9b6', stroke: 'var(--bg)', 'stroke-width': '1' });
+      dot.appendChild(svgEl('title', {}, `${d.year} Harmonized VIIRS-eq: ${fmt(d.harmonized)} (${d.kind})`));
+      svg.appendChild(dot);
+    });
+
+    // Legend
+    const lx = pad.left + 6, ly = pad.top - 18;
+    svg.appendChild(svgEl('rect', { x: lx, y: ly, width: 11, height: 11, fill: MODIS_COLOR, opacity: '0.6', rx: '2' }));
+    svg.appendChild(svgEl('text', { x: lx + 15, y: ly + 9, fill: 'var(--ash)', 'font-size': '10.5' }, isAr ? 'MODIS خام' : 'Raw MODIS'));
+    svg.appendChild(svgEl('rect', { x: lx + 92, y: ly, width: 11, height: 11, fill: VIIRS_COLOR, opacity: '0.6', rx: '2' }));
+    svg.appendChild(svgEl('text', { x: lx + 107, y: ly + 9, fill: 'var(--ash)', 'font-size': '10.5' }, isAr ? 'VIIRS خام' : 'Raw VIIRS'));
+    svg.appendChild(svgEl('line', { x1: lx + 185, y1: ly + 5, x2: lx + 205, y2: ly + 5, stroke: '#3cc9b6', 'stroke-width': '2.5' }));
+    svg.appendChild(svgEl('text', { x: lx + 210, y: ly + 9, fill: '#3cc9b6', 'font-size': '10.5', 'font-weight': '600' }, isAr ? 'السلسلة المنسقة الموثقة (VIIRS-eq)' : 'Validated Harmonized Series (VIIRS-eq)'));
+
+    return svg;
+  }
+
   /* ───── Render Whole Page ───── */
   function renderAnalytics() {
     const root = document.getElementById('analytics');
@@ -541,6 +644,19 @@
           </div>
         </section>
 
+        <!-- Section 6: Verified NASA FIRMS Egypt Archive (2000–2025) -->
+        <section class="an-section" id="an-verified-section" style="display:none;">
+          <h2 class="an-section__title">${isAr ? 'أرشيف NASA FIRMS الموثّق لمصر والتحقق خارج العينة (2000–2025)' : 'Verified NASA FIRMS Egypt Archive & Out-of-Sample Validation (2000–2025)'}</h2>
+          <p class="an-section__desc">
+            ${isAr
+              ? 'نتائج حقيقية مستخرجة من 74 ملف أرشيف رسمي لـ NASA FIRMS (تيرا، أكوا، S-NPP، NOAA-20) عبر خط المعالجة العلمي (pipeline/firms_pipeline.py) مع اختبار خارج العينة لـ 36 شهراً (2023–2025).'
+              : 'Real outputs processed from 74 official NASA FIRMS annual archive files (Terra, Aqua, S-NPP, NOAA-20) via pipeline/firms_pipeline.py with 36-month out-of-sample validation (2023–2025).'}
+          </p>
+          <div class="an-chart" id="an-verified-chart" style="margin-bottom:20px;"></div>
+          <div class="an-chart" id="an-verified-table" style="padding:20px;margin-bottom:20px;"></div>
+          <div id="an-verified-coverage" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;"></div>
+        </section>
+
         <p class="note" style="margin-top:36px;">
           ${t('demo_note', 'Calibrated synthetic model based on published NASA FIRMS distributions.')}
         </p>
@@ -554,6 +670,58 @@
     if (c1) c1.appendChild(buildYearlyChart(stats));
     if (c2) c2.appendChild(buildMonthlyChart(stats));
     if (c3) c3.appendChild(buildFrpChart(stats));
+
+    // Render Verified NASA FIRMS Archive Section (2000–2025)
+    if (typeof VERIFIED_FIRMS !== 'undefined' && VERIFIED_FIRMS && Array.isArray(VERIFIED_FIRMS.harmonizedYearly)) {
+      const vSec = document.getElementById('an-verified-section');
+      const vChart = document.getElementById('an-verified-chart');
+      const vTable = document.getElementById('an-verified-table');
+      const vCov = document.getElementById('an-verified-coverage');
+      if (vSec) vSec.style.display = 'block';
+      if (vChart) vChart.appendChild(buildVerifiedHarmonizedChart(VERIFIED_FIRMS.harmonizedYearly, isAr));
+      if (vTable && Array.isArray(VERIFIED_FIRMS.calibrationBaseline)) {
+        const rowsHtml = VERIFIED_FIRMS.calibrationBaseline.map(r => {
+          const pct = r.maeRaw > 0 ? Math.round(((r.maeRaw - r.maeAdjusted) / r.maeRaw) * 100) : 0;
+          const improved = r.status === 'mae_improved';
+          const badgeColor = improved ? 'var(--canopy)' : 'var(--smoke)';
+          const badgeText = improved
+            ? (isAr ? `تحسّن الخطأ ${pct}%` : `MAE −${pct}%`)
+            : (isAr ? 'نفس الدقة (لا حاجة للتحجيم)' : 'Same 375 m scale');
+          return `<tr style="border-bottom:1px solid var(--line);">
+            <td style="padding:10px;color:var(--white);font-weight:600;text-transform:uppercase;">${escapeHtml(r.source)}</td>
+            <td style="padding:10px;color:var(--ash);">${r.trainMonths} / ${r.testMonths}</td>
+            <td style="padding:10px;color:var(--ember);font-weight:600;">${r.factor}×</td>
+            <td style="padding:10px;color:var(--ash);">${r.maeRaw} → <b style="color:var(--white);">${r.maeAdjusted}</b></td>
+            <td style="padding:10px;color:var(--ash);">${r.biasRaw} → <b style="color:var(--white);">${r.biasAdjusted}</b></td>
+            <td style="padding:10px;"><span style="background:${badgeColor};color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${badgeText}</span></td>
+          </tr>`;
+        }).join('');
+        vTable.innerHTML = `
+          <h3 style="margin:0 0 12px;font-size:18px;color:var(--white);">${isAr ? 'التحقق خارج العينة ضد VIIRS S-NPP (فترة الاختبار 2023–2025)' : 'Out-of-Sample Calibration vs. VIIRS S-NPP (Test Holdout 2023–2025)'}</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--line);text-align:${isAr ? 'right' : 'left'};color:var(--smoke);">
+                <th style="padding:10px;">${isAr ? 'القمر' : 'Platform'}</th>
+                <th style="padding:10px;">${isAr ? 'تدريب / اختبار (شهر)' : 'Train / Test (mo)'}</th>
+                <th style="padding:10px;">${isAr ? 'معامل المعايرة' : 'Scale Factor'}</th>
+                <th style="padding:10px;">${isAr ? 'خطأ MAE (خام ← منسق)' : 'MAE (Raw → Adj)'}</th>
+                <th style="padding:10px;">${isAr ? 'الانحياز (خام ← منسق)' : 'Bias (Raw → Adj)'}</th>
+                <th style="padding:10px;">${isAr ? 'النتيجة' : 'Validation'}</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>`;
+      }
+      if (vCov && Array.isArray(VERIFIED_FIRMS.coverage)) {
+        vCov.innerHTML = VERIFIED_FIRMS.coverage.map(c => `
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;">
+            <span style="font-size:11px;color:var(--ember);text-transform:uppercase;font-weight:600;">${escapeHtml(c.product)}</span>
+            <b style="display:block;font-family:var(--fd);font-size:20px;color:var(--white);margin:4px 0;">${escapeHtml(c.platform.toUpperCase())}</b>
+            <span style="display:block;font-size:12px;color:var(--ash);">${escapeHtml(c.start)} → ${escapeHtml(c.end)}</span>
+            <span style="display:block;font-size:11.5px;color:var(--smoke);margin-top:4px;">${c.completeMonths} ${isAr ? 'شهراً مكتملاً' : 'complete months'} · ${c.archiveFiles} ${isAr ? 'ملفاً' : 'files'}</span>
+          </div>`).join('');
+      }
+    }
 
     // Render Harmonization Calibration Box
     const calibBox = document.getElementById('an-calib-box');

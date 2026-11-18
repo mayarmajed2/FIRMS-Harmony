@@ -1,0 +1,5 @@
+﻿platform,product,processing,usable_start,usable_end,complete_months,zero_count_months,partial_months,missing_months,first_detection,last_detection,archive_files,status
+terra,MODIS,Standard Processing,2000-11,2025-12,302,1,0,11,2000-11-02,2025-12-31,26,verified_local_archive
+aqua,MODIS,Standard Processing,2002-07,2025-12,282,2,0,11,2002-07-07,2025-12-24,26,verified_local_archive
+snpp,VIIRS S-NPP,Standard Processing,2012-02,2025-12,167,0,1,11,2012-01-20,2025-12-31,14,verified_local_archive
+noaa20,VIIRS NOAA-20,Standard Processing,2018-04,2025-12,93,0,0,11,2018-04-01,2025-12-31,8,verified_local_archive
