@@ -80,6 +80,7 @@
   }
 
   function resolutionSVG() {
+    const isAr = typeof LANG !== 'undefined' && LANG === 'ar';
     const W = 620, H = 260;
     const modisSide = 120;
     const viirsSide = Math.round(modisSide * 375 / 1000);
@@ -87,9 +88,9 @@
 
     const mx = 80, my = 55;
     let modisBlock = `<rect x="${mx}" y="${my}" width="${modisSide}" height="${modisSide}" fill="none" stroke="var(--canopy)" stroke-width="2.5" rx="4"/>`;
-    modisBlock += `<text x="${mx + modisSide / 2}" y="${my + modisSide / 2 + 5}" text-anchor="middle" fill="var(--canopy)" font-size="14" font-weight="600">1 km</text>`;
+    modisBlock += `<text x="${mx + modisSide / 2}" y="${my + modisSide / 2 + 5}" text-anchor="middle" fill="var(--canopy)" font-size="14" font-weight="600">${isAr ? '1 كم' : '1 km'}</text>`;
     modisBlock += `<text x="${mx + modisSide / 2}" y="${my - 14}" text-anchor="middle" fill="var(--white)" font-size="13" font-weight="600">MODIS</text>`;
-    modisBlock += `<text x="${mx + modisSide / 2}" y="${my + modisSide + 24}" text-anchor="middle" fill="var(--smoke)" font-size="11">1 km² (1 pixel)</text>`;
+    modisBlock += `<text x="${mx + modisSide / 2}" y="${my + modisSide + 24}" text-anchor="middle" fill="var(--smoke)" font-size="11">${isAr ? '1 كم² (بكسل واحد)' : '1 km² (1 pixel)'}</text>`;
     modisBlock += `<text x="${mx + modisSide / 2}" y="${my + modisSide / 2 + 26}" text-anchor="middle" font-size="16">🔥</text>`;
 
     const vx = 370, vy = my;
@@ -108,15 +109,15 @@
     }
     const gridTotal = cols * (viirsSide + 2);
     viirsBlock += `<text x="${vx + gridTotal / 2}" y="${vy - 14}" text-anchor="middle" fill="var(--white)" font-size="13" font-weight="600">VIIRS</text>`;
-    viirsBlock += `<text x="${vx + gridTotal / 2}" y="${vy + gridTotal + 18}" text-anchor="middle" fill="var(--smoke)" font-size="11">≈ 7 pixels in same footprint</text>`;
-    viirsBlock += `<text x="${vx + gridTotal / 2}" y="${vy + gridTotal + 34}" text-anchor="middle" fill="var(--ember)" font-size="11">375 m pixel</text>`;
+    viirsBlock += `<text x="${vx + gridTotal / 2}" y="${vy + gridTotal + 18}" text-anchor="middle" fill="var(--smoke)" font-size="11">${isAr ? '≈ 7 بكسلات في نفس المساحة' : '≈ 7 pixels in same footprint'}</text>`;
+    viirsBlock += `<text x="${vx + gridTotal / 2}" y="${vy + gridTotal + 34}" text-anchor="middle" fill="var(--ember)" font-size="11">${isAr ? 'بكسل 375 م' : '375 m pixel'}</text>`;
 
     const arrowX1 = mx + modisSide + 25, arrowX2 = vx - 25, arrowY = my + modisSide / 2;
     const arrow = `<line x1="${arrowX1}" y1="${arrowY}" x2="${arrowX2}" y2="${arrowY}" stroke="var(--smoke)" stroke-width="1.5" stroke-dasharray="5 4"/>
       <polygon points="${arrowX2},${arrowY - 5} ${arrowX2 + 8},${arrowY} ${arrowX2},${arrowY + 5}" fill="var(--smoke)"/>
-      <text x="${(arrowX1 + arrowX2) / 2}" y="${arrowY - 12}" text-anchor="middle" fill="var(--smoke)" font-size="10">same area</text>`;
+      <text x="${(arrowX1 + arrowX2) / 2}" y="${arrowY - 12}" text-anchor="middle" fill="var(--smoke)" font-size="10">${isAr ? 'نفس المساحة' : 'same area'}</text>`;
 
-    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:auto;" role="img" aria-label="MODIS 1km vs VIIRS 375m pixel resolution comparison">
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:auto;" role="img" aria-label="${isAr ? 'مقارنة الدقة المكانية بين MODIS وVIIRS' : 'MODIS 1km vs VIIRS 375m pixel resolution comparison'}">
       ${modisBlock}${arrow}${viirsBlock}
     </svg>`;
   }
@@ -126,10 +127,9 @@
     if (!s) return;
 
     const isAr = typeof LANG !== 'undefined' && LANG === 'ar';
-    const overlapTotal = s.overlapYears.reduce((a, d) => a + d.modis + d.viirs, 0);
     const overlapModis = s.overlapYears.reduce((a, d) => a + d.modis, 0);
     const overlapViirs = s.overlapYears.reduce((a, d) => a + d.viirs, 0);
-    const ratio = overlapModis > 0 ? (overlapViirs / overlapModis) : 3.4;
+    const ratio = (overlapModis > 0 && overlapViirs > 0) ? (overlapViirs / overlapModis) : null;
 
     const container = document.getElementById('sensors');
     if (!container) return;
@@ -229,7 +229,9 @@
         <h2 style="font-size:clamp(24px,3.5vw,34px);margin-bottom:8px;">${t('se_overlap_title', 'The Overlap Period (2012–2024)')}</h2>
         <p style="color:var(--smoke);max-width:44em;font-size:15px;margin:0 0 16px;line-height:1.6;">
           ${t('se_overlap_desc', 'During the simultaneous overlap window (2012–2024), VIIRS records roughly 3–4× as many fire detections as MODIS for the exact same geographical corridor.')}
-          ${isAr ? `(نسبة التضاعف الفعلية: <b style="color:var(--ember)">${fmtDec(ratio, 1)}×</b>)` : `(Observed empirical ratio: <b style="color:var(--ember)">${fmtDec(ratio, 1)}×</b>)`}
+          ${ratio !== null
+            ? (isAr ? `(نسبة التضاعف الفعلية: <b style="color:var(--ember)">${fmtDec(ratio, 1)}×</b>)` : `(Observed empirical ratio: <b style="color:var(--ember)">${fmtDec(ratio, 1)}×</b>)`)
+            : (isAr ? `(يتطلب رصدات متزامنة لكلا المستشعرين)` : `(Requires co-observations from both sensors)`)}
         </p>
 
         <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:56px;overflow-x:auto;">
@@ -291,4 +293,5 @@
   }
 
   document.addEventListener('langchange', buildSensorsPage);
+  document.addEventListener('dataupdated', buildSensorsPage);
 })();

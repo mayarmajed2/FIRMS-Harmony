@@ -7,9 +7,20 @@
 
   const MODIS_COLOR = '#f08a3c';
   const VIIRS_COLOR = '#e0432b';
+  let lastUploadStatus = '';
 
   const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+  function arrayMinMax(arr) {
+    let min = Infinity, max = -Infinity;
+    for (let i = 0; i < arr.length; i++) {
+      const v = arr[i];
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+    return { min, max };
+  }
 
   function getMonths() {
     return (typeof LANG !== 'undefined' && LANG === 'ar') ? MONTHS_AR : MONTHS_EN;
@@ -40,8 +51,7 @@
     const viirs = DATA.filter(d => d.sensor === 'VIIRS');
     const allFrp = DATA.map(d => d.frp);
     const years = DATA.map(d => d.year);
-    const minYear = Math.min(...years);
-    const maxYear = Math.max(...years);
+    const { min: minYear, max: maxYear } = arrayMinMax(years);
 
     /* yearly counts by sensor */
     const yearlyModis = {};
@@ -69,7 +79,7 @@
     const peakMonthIdx = monthlyTotal.indexOf(Math.max(...monthlyTotal));
 
     /* FRP histogram */
-    const frpMax = Math.max(...allFrp);
+    const frpMax = arrayMinMax(allFrp).max;
     const binCount = 18;
     const binWidth = Math.ceil(frpMax / binCount) || 1;
     const frpBins = new Array(binCount).fill(0);
@@ -549,29 +559,38 @@
     const calibBox = document.getElementById('an-calib-box');
     if (calibBox && typeof computeHarmonizationCalibration === 'function') {
       const calib = computeHarmonizationCalibration();
+      const ratioDisplay = calib.countRatio !== null ? `${calib.countRatio}×` : '—';
+      const modisFrpDisplay = calib.modisMeanFrp !== null ? `${calib.modisMeanFrp} <small style="font-size:13px;">MW</small>` : '—';
+      const viirsFrpDisplay = calib.viirsMeanFrp !== null ? `${calib.viirsMeanFrp} <small style="font-size:13px;">MW</small>` : '—';
+      const alphaDisplay = calib.frpMeanRatio !== null ? `${calib.frpMeanRatio}` : '—';
+      const missingSensorNote = calib.countRatio === null
+        ? `<p style="margin:14px 0 0;font-size:12px;color:var(--smoke);">${isAr ? 'ملاحظة: يتطلب حساب معاملات التنسيق وجود رصدات متزامنة من كلا المستشعرين (MODIS وVIIRS) في الفترة 2012–2024.' : 'Note: Cross-sensor calibration ratios require both MODIS and VIIRS observations within the 2012–2024 overlap window.'}</p>`
+        : '';
+
       calibBox.innerHTML = `
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
           <div style="background:rgba(255,255,255,.03);padding:14px;border-radius:8px;">
             <span style="font-size:12px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'نسبة رصد VIIRS إلى MODIS' : 'VIIRS / MODIS Count Ratio'}</span>
-            <b style="font-size:24px;color:var(--ember);font-family:var(--fd);">${calib.countRatio}×</b>
+            <b style="font-size:24px;color:var(--ember);font-family:var(--fd);">${ratioDisplay}</b>
             <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${isAr ? 'عامل تضخم الدقة المكانية' : 'Resolution inflation factor'}</span>
           </div>
           <div style="background:rgba(255,255,255,.03);padding:14px;border-radius:8px;">
             <span style="font-size:12px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'متوسط FRP لمستشعر MODIS' : 'MODIS Mean FRP'}</span>
-            <b style="font-size:24px;color:#f08a3c;font-family:var(--fd);">${calib.modisMeanFrp} <small style="font-size:13px;">MW</small></b>
+            <b style="font-size:24px;color:#f08a3c;font-family:var(--fd);">${modisFrpDisplay}</b>
             <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${isAr ? 'رصد الحرائق الأكبر فقط' : 'Coarser 1 km threshold'}</span>
           </div>
           <div style="background:rgba(255,255,255,.03);padding:14px;border-radius:8px;">
             <span style="font-size:12px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'متوسط FRP لمستشعر VIIRS' : 'VIIRS Mean FRP'}</span>
-            <b style="font-size:24px;color:#e0432b;font-family:var(--fd);">${calib.viirsMeanFrp} <small style="font-size:13px;">MW</small></b>
+            <b style="font-size:24px;color:#e0432b;font-family:var(--fd);">${viirsFrpDisplay}</b>
             <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${isAr ? 'رصد الحرائق الزراعية الباردة' : 'Sensitive to cooler fires'}</span>
           </div>
           <div style="background:rgba(255,255,255,.03);padding:14px;border-radius:8px;">
             <span style="font-size:12px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'نسبة متوسط الشدة (α)' : 'Mean Intensity Ratio (α)'}</span>
-            <b style="font-size:24px;color:var(--canopy);font-family:var(--fd);">${calib.frpMeanRatio}</b>
+            <b style="font-size:24px;color:var(--canopy);font-family:var(--fd);">${alphaDisplay}</b>
             <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${isAr ? 'معامل التنسيق الطيفي' : 'Sub-pixel dilution scaling'}</span>
           </div>
         </div>
+        ${missingSensorNote}
       `;
     }
 
@@ -580,28 +599,40 @@
     const fileInput = document.getElementById('firmsFileInput');
     const btnReset = document.getElementById('btnResetFIRMS');
     const statusSpan = document.getElementById('firmsUploadStatus');
+    if (statusSpan && lastUploadStatus) {
+      statusSpan.textContent = lastUploadStatus;
+    }
 
     if (btnUpload && fileInput) {
       btnUpload.onclick = () => fileInput.click();
       fileInput.onchange = (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
+        if (file.size > 50 * 1024 * 1024) {
+          lastUploadStatus = isAr ? '❌ حجم الملف يتجاوز الحد الأقصى المسموح (50 ميجابايت).' : '❌ File exceeds maximum supported size (50 MB).';
+          if (statusSpan) statusSpan.textContent = lastUploadStatus;
+          return;
+        }
         statusSpan.textContent = isAr ? 'جارٍ تحليل الملف...' : 'Parsing file...';
         const reader = new FileReader();
         reader.onload = (evt) => {
           try {
-            const { parsed, skippedOutside } = parseFIRMSCSV(evt.target.result);
+            const { parsed, skippedOutside, skippedInvalid } = parseFIRMSCSV(evt.target.result);
             if (!parsed.length) {
-              statusSpan.textContent = isAr ? '⚠️ لم يتم العثور على رصدات داخل ممر النيل في هذا الملف.' : '⚠️ No detections found inside Nile boundary in this file.';
+              lastUploadStatus = isAr ? '⚠️ لم يتم العثور على رصدات صالحة داخل ممر النيل في هذا الملف.' : '⚠️ No valid detections found inside Nile boundary in this file.';
+              if (statusSpan) statusSpan.textContent = lastUploadStatus;
               return;
             }
+            const invNote = skippedInvalid
+              ? (isAr ? `، ${skippedInvalid} صفوف غير صالحة` : `, ${skippedInvalid} malformed rows skipped`)
+              : '';
+            lastUploadStatus = isAr
+              ? `✅ تم تحميل ${parsed.length} رصدة بنجاح (تم استبعاد ${skippedOutside} خارج النطاق${invNote}).`
+              : `✅ Successfully loaded ${parsed.length} detections (${skippedOutside} outside boundary excluded${invNote}).`;
             loadCustomFIRMS(parsed);
-            statusSpan.textContent = isAr 
-              ? `✅ تم تحميل ${parsed.length} رصدة بنجاح (تم استبعاد ${skippedOutside} خارج النطاق).`
-              : `✅ Successfully loaded ${parsed.length} detections (${skippedOutside} outside boundary excluded).`;
-            renderAnalytics();
           } catch (err) {
-            statusSpan.textContent = '❌ Error: ' + err.message;
+            lastUploadStatus = '❌ Error: ' + err.message;
+            if (statusSpan) statusSpan.textContent = lastUploadStatus;
           }
         };
         reader.readAsText(file);
@@ -610,9 +641,8 @@
 
     if (btnReset) {
       btnReset.onclick = () => {
+        lastUploadStatus = isAr ? 'تمت استعادة البيانات القياسية.' : 'Reset to calibrated benchmark dataset.';
         resetToBenchmark();
-        if (statusSpan) statusSpan.textContent = isAr ? 'تمت استعادة البيانات القياسية.' : 'Reset to calibrated benchmark dataset.';
-        renderAnalytics();
       };
     }
   }

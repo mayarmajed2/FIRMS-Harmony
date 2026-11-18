@@ -1,18 +1,34 @@
 /* home.js: dynamic animated statistics on the home page computed from DATA. */
 
 function getHomeStats() {
-  const total = (typeof DATA !== 'undefined' && Array.isArray(DATA)) ? DATA.length : 1018;
-  let medFrp = 5.2;
-  if (typeof DATA !== 'undefined' && Array.isArray(DATA) && DATA.length) {
+  const hasData = typeof DATA !== 'undefined' && Array.isArray(DATA) && DATA.length > 0;
+  const total = hasData ? DATA.length : 0;
+  let medFrp = 0;
+  let yearsCount = 0;
+  let sensorsCount = 0;
+
+  if (hasData) {
     const frps = DATA.map(d => d.frp).sort((a, b) => a - b);
     const mid = Math.floor(frps.length / 2);
     medFrp = frps.length % 2 ? frps[mid] : (frps[mid - 1] + frps[mid]) / 2;
+
+    let minY = Infinity, maxY = -Infinity;
+    const sensors = new Set();
+    for (let i = 0; i < DATA.length; i++) {
+      const y = DATA[i].year;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+      if (DATA[i].sensor) sensors.add(DATA[i].sensor);
+    }
+    yearsCount = Number.isFinite(minY) && Number.isFinite(maxY) ? (maxY - minY + 1) : 0;
+    sensorsCount = sensors.size;
   }
+
   return [
     ['st_det', total, 0],
     ['st_frp', +medFrp.toFixed(1), 1],
-    ['st_days', 24, 0], // 2001–2024 (24 years of data)
-    ['st_sens', 2, 0]   // MODIS and VIIRS
+    ['st_days', yearsCount, 0],
+    ['st_sens', sensorsCount, 0]
   ];
 }
 

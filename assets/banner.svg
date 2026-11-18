@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="Fire Harmony — Cross-Sensor Satellite Fire Monitoring for the Nile Valley and Delta">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#17110c"/>
+      <stop offset="52%" stop-color="#1e1510"/>
+      <stop offset="100%" stop-color="#10252b"/>
+    </linearGradient>
+    <radialGradient id="glowLeft" cx="18%" cy="50%" r="42%">
+      <stop offset="0%" stop-color="#ff5a4a" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#17110c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRight" cx="85%" cy="45%" r="38%">
+      <stop offset="0%" stop-color="#3cc9b6" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#10252b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#e0432b"/>
+      <stop offset="55%" stop-color="#f08a3c"/>
+      <stop offset="100%" stop-color="#ffd36a"/>
+    </linearGradient>
+    <linearGradient id="nileGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3cc9b6"/>
+      <stop offset="100%" stop-color="#1f7a78"/>
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e0432b"/>
+      <stop offset="45%" stop-color="#f08a3c"/>
+      <stop offset="70%" stop-color="#ffd36a"/>
+      <stop offset="100%" stop-color="#3cc9b6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="1200" height="300" rx="18" fill="url(#bgGrad)"/>
+  <rect width="1200" height="300" rx="18" fill="url(#glowLeft)"/>
+  <rect width="1200" height="300" rx="18" fill="url(#glowRight)"/>
+  <rect x="1" y="1" width="1198" height="298" rx="17" fill="none" stroke="#e0d6c8" stroke-opacity="0.14"/>
+
+  <!-- Subtle lat/lon grid -->
+  <g stroke="#e0d6c8" stroke-opacity="0.05" stroke-width="1">
+    <line x1="0" y1="75" x2="1200" y2="75"/>
+    <line x1="0" y1="150" x2="1200" y2="150"/>
+    <line x1="0" y1="225" x2="1200" y2="225"/>
+    <line x1="240" y1="0" x2="240" y2="300"/>
+    <line x1="480" y1="0" x2="480" y2="300"/>
+    <line x1="720" y1="0" x2="720" y2="300"/>
+    <line x1="960" y1="0" x2="960" y2="300"/>
+  </g>
+
+  <!-- Left Emblem -->
+  <g transform="translate(86, 66) scale(3.5)">
+    <ellipse cx="24" cy="24" rx="21" ry="9" fill="none" stroke="url(#nileGrad)" stroke-width="1.6" stroke-dasharray="3.5 2" transform="rotate(-28 24 24)"/>
+    <circle cx="41.5" cy="15" r="2.6" fill="#ffd36a" stroke="#17110c" stroke-width="1.1"/>
+    <line x1="37" y1="13.5" x2="46" y2="16.5" stroke="#3cc9b6" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M24 6 C24 6 15 17 15 26 C15 32 19 37 24 37 C29 37 33 32 33 26 C33 17 24 6 24 6 Z" fill="url(#fireGrad)"/>
+    <path d="M24 37 C22 32 26 27 24 22 C23 19 24.5 16 24 13" fill="none" stroke="#14323a" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M24 37 C22 32 26 27 24 22 C23 19 24.5 16 24 13" fill="none" stroke="url(#nileGrad)" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M24 23 C21.5 27 21 29 21 32 C21 34.5 22.5 36 24 36 C25.5 36 27 34.5 27 32 C27 29 26.5 27 24 23 Z" fill="#fff3c4" opacity="0.9"/>
+  </g>
+
+  <!-- Title & Tagline -->
+  <text x="300" y="122" font-family="Georgia, 'Times New Roman', serif" font-size="64" fill="#fbf5ea" letter-spacing="0.5">
+    Fire <tspan fill="#ff5a4a">Harmony</tspan>
+  </text>
+  <rect x="300" y="142" width="470" height="3.5" rx="2" fill="url(#accentLine)"/>
+  <text x="300" y="182" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="21" fill="#e0d6c8">
+    Cross-Sensor Satellite Fire Monitoring &amp; Harmonization
+  </text>
+  <text x="300" y="212" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="15.5" fill="#9a8e7e">
+    Nile Valley &amp; Delta, Egypt (24.0°N – 31.6°N) · MODIS 1 km vs. VIIRS 375 m · Bilingual EN / AR
+  </text>
+
+  <!-- Right stylized Nile + Thermal Dots -->
+  <g transform="translate(885, 22)" fill="none">
+    <path d="M140 250 C138 215 128 190 130 165 C135 140 155 130 148 105 C140 85 128 80 128 60" stroke="#1f7a78" stroke-width="18" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M128 60 C112 44 100 32 82 14 M128 60 C145 44 166 32 188 14 M128 60 C128 42 128 28 130 12" stroke="#1f7a78" stroke-width="12" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M140 250 C138 215 128 190 130 165 C135 140 155 130 148 105 C140 85 128 80 128 60" stroke="#3cc9b6" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M128 60 C112 44 100 32 82 14 M128 60 C145 44 166 32 188 14 M128 60 C128 42 128 28 130 12" stroke="#3cc9b6" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- MODIS squares -->
+    <rect x="122" y="156" width="12" height="12" fill="#f08a3c" fill-opacity="0.35" stroke="#f08a3c" stroke-width="1.5"/>
+    <rect x="118" y="42" width="12" height="12" fill="#f08a3c" fill-opacity="0.35" stroke="#f08a3c" stroke-width="1.5"/>
+    <rect x="150" y="34" width="12" height="12" fill="#ffd36a" fill-opacity="0.35" stroke="#ffd36a" stroke-width="1.5"/>
+    <!-- VIIRS circles -->
+    <circle cx="106" cy="36" r="4" fill="#ff5a4a"/>
+    <circle cx="136" cy="28" r="3.5" fill="#e0432b"/>
+    <circle cx="168" cy="26" r="4.5" fill="#ffd36a"/>
+    <circle cx="144" cy="112" r="4" fill="#ff5a4a"/>
+    <circle cx="136" cy="212" r="3.5" fill="#f08a3c"/>
+    <circle cx="106" cy="36" r="10" stroke="#ff5a4a" stroke-opacity="0.45" stroke-width="1.2"/>
+    <circle cx="168" cy="26" r="11" stroke="#ffd36a" stroke-opacity="0.4" stroke-width="1.2"/>
+  </g>
+</svg>

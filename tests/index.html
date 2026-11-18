@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Fire Harmony — Automated Test Suite</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #17110c; color: #e0d6c8; padding: 24px; max-width: 960px; margin: auto; }
+  h1 { color: #fbf5ea; }
+  .summary { padding: 14px 18px; border-radius: 10px; margin: 16px 0 24px; font-weight: 600; font-size: 16px; }
+  .summary.pass { background: rgba(31,122,120,.25); border: 1px solid #1f7a78; color: #8de3d3; }
+  .summary.fail { background: rgba(224,67,43,.2); border: 1px solid #e0432b; color: #ff8a7a; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 8px 12px; margin-bottom: 6px; border-radius: 6px; background: rgba(255,255,255,.04); font-family: monospace; font-size: 13px; }
+  li.pass { border-left: 4px solid #1f7a78; }
+  li.fail { border-left: 4px solid #e0432b; color: #ff9c8e; }
+  #app-fixture { display: none; }
+</style>
+</head>
+<body>
+<h1>Fire Harmony — Automated Verification &amp; Adversarial Test Suite</h1>
+<div id="summary" class="summary">Running tests...</div>
+<ul id="results"></ul>
+
+<!-- Minimal DOM fixture mirroring index.html -->
+<div id="app-fixture">
+  <a id="skip" href="#main"></a>
+  <button id="lang" type="button"></button>
+  <nav id="nav">
+    <a href="#home"></a><a href="#map"></a><a href="#analytics"></a>
+    <a href="#sensors"></a><a href="#methodology"></a><a href="#about"></a>
+  </nav>
+  <main id="main" tabindex="-1">
+    <div class="page" id="home"><div id="stats"></div><div id="heroSvg"></div></div>
+    <div class="page" id="map">
+      <div class="mapgrid">
+        <aside class="panel">
+          <input type="checkbox" id="fM" checked>
+          <input type="checkbox" id="fV" checked>
+          <select id="y0"></select><select id="y1"></select>
+          <b id="frpv">0 MW</b>
+          <input type="range" id="frp" min="0" max="60" value="0">
+          <div id="count"></div>
+        </aside>
+        <div class="mapbox"><div id="mapCanvas"></div></div>
+        <div class="panel" id="info"></div>
+      </div>
+    </div>
+    <div class="page" id="analytics"></div>
+    <div class="page" id="sensors"></div>
+    <div class="page" id="methodology"></div>
+    <div class="page" id="about"></div>
+  </main>
+</div>
+
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/hero.js"></script>
+<script src="../js/home.js"></script>
+<script src="../js/map.js"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/sensors.js"></script>
+<script src="../js/methodology.js"></script>
+<script src="../js/about.js"></script>
+<script src="../js/router.js"></script>
+
+<script>
+(function () {
+  'use strict';
+
+  const results = [];
+  function test(name, fn) {
+    try {
+      fn();
+      results.push({ name, pass: true });
+    } catch (err) {
+      results.push({ name, pass: false, error: err && err.message ? err.message : String(err) });
+    }
+  }
+  function assert(cond, msg) {
+    if (!cond) throw new Error(msg || 'Assertion failed');
+  }
+  function assertEqual(actual, expected, msg) {
+    if (actual !== expected) {
+      throw new Error((msg ? msg + ': ' : '') + `expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+  }
+
+  /* ── 1. Benchmark Dataset Integrity ── */
+  test('Benchmark DATA is populated and deterministic', () => {
+    assert(Array.isArray(DATA) && DATA.length > 500, 'Expected >500 benchmark records, got ' + DATA.length);
+    assert(BENCHMARK_DATA.length === DATA.length, 'BENCHMARK_DATA should match initial DATA');
+    const modis = DATA.filter(d => d.sensor === 'MODIS').length;
+    const viirs = DATA.filter(d => d.sensor === 'VIIRS').length;
+    assert(modis > 100 && viirs > 200, `Unexpected sensor split: MODIS=${modis}, VIIRS=${viirs}`);
+  });
+
+  test('All benchmark coordinates fall inside Nile BOUNDARY and have valid fields', () => {
+    for (const d of DATA) {
+      assert(inside(d.lat, d.lon), `Point (${d.lat}, ${d.lon}) outside BOUNDARY`);
+      assert(/^\d{4}-\d{2}-\d{2}$/.test(d.date), `Invalid date: ${d.date}`);
+      assert(Number.isFinite(d.frp) && d.frp > 0, `Invalid FRP: ${d.frp}`);
+      assert(Number.isInteger(d.year) && d.year >= 2001 && d.year <= 2024, `Invalid year: ${d.year}`);
+    }
+  });
+
+  /* ── 2. Spatial Ray-Casting Tests ── */
+  test('Ray-casting inside() accepts Nile Valley & Delta locations', () => {
+    assert(inside(31.05, 31.38), 'Dakahlia should be inside');
+    assert(inside(30.72, 31.50), 'Sharqia should be inside');
+    assert(inside(30.04, 31.24), 'Cairo should be inside');
+    assert(inside(25.70, 32.64), 'Luxor should be inside');
+    assert(inside(24.09, 32.90), 'Aswan should be inside');
+  });
+
+  test('Ray-casting inside() rejects desert, sea, and invalid coordinates', () => {
+    assert(!inside(27.50, 26.10), 'Western Desert should be outside');
+    assert(!inside(29.50, 34.00), 'Sinai should be outside');
+    assert(!inside(32.50, 31.00), 'Mediterranean Sea should be outside');
+    assert(!inside(22.00, 32.90), 'South of Aswan should be outside');
+    assert(!inside(NaN, 31.0), 'NaN latitude should be outside');
+  });
+
+  /* ── 3. Standard NASA FIRMS CSV Parsing ── */
+  test('parseFIRMSCSV classifies real NASA FIRMS Suomi NPP (satellite=N, instrument=VIIRS) as VIIRS', () => {
+    const csv = [
+      'latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_t31,frp,daynight',
+      '31.0421,31.3784,321.4,0.42,0.38,2023-10-18,1132,N,VIIRS,n,2.0NRT,298.1,6.4,D',
+      '30.8812,31.0125,314.8,0.45,0.40,2023-10-19,1115,1,VIIRS,n,2.0NRT,296.4,11.2,D',
+      '30.0444,31.2357,312.0,1.00,1.00,2023-10-20,1100,Aqua,MODIS,85,6.1,295.0,14.5,D'
+    ].join('\n');
+    const { parsed, skippedOutside } = parseFIRMSCSV(csv);
+    assertEqual(parsed.length, 3, 'Should parse 3 rows');
+    assertEqual(skippedOutside, 0, 'Should skip 0 rows');
+    assertEqual(parsed[0].sensor, 'VIIRS', 'Suomi NPP (N/VIIRS) must be VIIRS');
+    assertEqual(parsed[1].sensor, 'VIIRS', 'NOAA-20 (1/VIIRS) must be VIIRS');
+    assertEqual(parsed[2].sensor, 'MODIS', 'Aqua/MODIS must be MODIS');
+  });
+
+  /* ── 4. Adversarial & Security CSV Tests ── */
+  test('parseFIRMSCSV rejects empty and header-only CSVs', () => {
+    let threwEmpty = false;
+    try { parseFIRMSCSV(''); } catch (e) { threwEmpty = true; }
+    assert(threwEmpty, 'Empty CSV should throw');
+
+    let threwHeader = false;
+    try { parseFIRMSCSV('latitude,longitude,acq_date\n'); } catch (e) { threwHeader = true; }
+    assert(threwHeader, 'Header-only CSV should throw');
+  });
+
+  test('parseFIRMSCSV rejects CSV missing required columns', () => {
+    let threw = false;
+    try { parseFIRMSCSV('lat,lon,frp\n31.0,31.3,5.0'); } catch (e) { threw = true; }
+    assert(threw, 'CSV missing acq_date should throw');
+  });
+
+  test('parseFIRMSCSV rejects malformed dates and XSS payloads in acq_date', () => {
+    const csv = [
+      'latitude,longitude,acq_date,frp,instrument',
+      '31.04,31.37,not-a-date,5.0,VIIRS',
+      '31.04,31.37,2023-10-18<img src=x onerror=alert(1)>,5.0,VIIRS',
+      '31.04,31.37,2023-10-18,7.2,VIIRS'
+    ].join('\n');
+    const { parsed } = parseFIRMSCSV(csv);
+    assertEqual(parsed.length, 1, 'Only valid YYYY-MM-DD row should be accepted');
+    assertEqual(parsed[0].date, '2023-10-18');
+    assertEqual(parsed[0].year, 2023);
+  });
+
+  test('parseFIRMSCSV handles quoted fields and excludes out-of-bounds points', () => {
+    const csv = [
+      '"latitude","longitude","acq_date","frp","instrument"',
+      '"31.0500","31.3800","2025-11-02","8.5","VIIRS"',
+      '"27.5000","26.1000","2025-11-02","19.0","VIIRS"'
+    ].join('\r\n');
+    const { parsed, skippedOutside } = parseFIRMSCSV(csv);
+    assertEqual(parsed.length, 1);
+    assertEqual(skippedOutside, 1);
+    assertEqual(parsed[0].year, 2025);
+  });
+
+  /* ── 5. Harmonization Edge Cases ── */
+  test('computeHarmonizationCalibration handles VIIRS-only dataset without fake MODIS=1 division', () => {
+    const viirsOnly = [
+      { id: 0, sensor: 'VIIRS', lat: 31.05, lon: 31.38, year: 2023, date: '2023-10-18', frp: 6.0 },
+      { id: 1, sensor: 'VIIRS', lat: 30.87, lon: 31.00, year: 2023, date: '2023-10-19', frp: 8.0 }
+    ];
+    const c = computeHarmonizationCalibration(viirsOnly);
+    assertEqual(c.modisCount, 0, 'modisCount should be 0, not 1');
+    assertEqual(c.countRatio, null, 'countRatio should be null when MODIS count is 0');
+    assertEqual(c.frpMeanRatio, null, 'frpMeanRatio should be null when MODIS count is 0');
+  });
+
+  test('computeHarmonizationCalibration handles MODIS-only dataset without fake VIIRS=1 division', () => {
+    const modisOnly = [
+      { id: 0, sensor: 'MODIS', lat: 31.05, lon: 31.38, year: 2023, date: '2023-10-18', frp: 12.0 }
+    ];
+    const c = computeHarmonizationCalibration(modisOnly);
+    assertEqual(c.viirsCount, 0, 'viirsCount should be 0, not 1');
+    assertEqual(c.countRatio, null, 'countRatio should be null when VIIRS count is 0');
+  });
+
+  /* ── 6. State Synchronization & Dynamic Updates ── */
+  test('loadCustomFIRMS updates Home KPIs dynamically (years & sensors, not hardcoded 24/2)', () => {
+    const custom = [
+      { id: 0, sensor: 'VIIRS', lat: 31.05, lon: 31.38, year: 2025, date: '2025-10-18', frp: 9.0 },
+      { id: 1, sensor: 'VIIRS', lat: 30.87, lon: 31.00, year: 2026, date: '2026-11-01', frp: 11.0 }
+    ];
+    loadCustomFIRMS(custom);
+    const stats = getHomeStats();
+    assertEqual(stats[0][1], 2, 'Total detections should be 2');
+    assertEqual(stats[2][1], 2, 'Years of record should be 2 (2025-2026), not hardcoded 24');
+    assertEqual(stats[3][1], 1, 'Sensors harmonized should be 1 (VIIRS only), not hardcoded 2');
+  });
+
+  test('Map year dropdowns dynamically adapt to 2025–2026 custom CSV uploads', () => {
+    const y0 = $('y0'), y1 = $('y1');
+    const filtered = getFilteredData();
+    assertEqual(filtered.length, 2, 'Map filter should include uploaded 2025–2026 rows');
+    assertEqual(+y0.value, 2025, 'y0 should update to 2025');
+    assertEqual(+y1.value, 2026, 'y1 should update to 2026');
+  });
+
+  test('Sensors page updates dynamically on dataupdated event', () => {
+    const text = $('sensors').textContent;
+    assert(text.includes('(2 '), 'Sensors page should reflect 2 total records after custom upload');
+  });
+
+  test('resetToBenchmark restores original dataset across all views', () => {
+    resetToBenchmark();
+    assertEqual(DATA.length, BENCHMARK_DATA.length, 'DATA restored');
+    assertEqual(getHomeStats()[0][1], BENCHMARK_DATA.length, 'Home KPI restored');
+  });
+
+  /* ── 7. Bilingual / RTL Parity ── */
+  test('applyLang("ar") sets RTL and translates About page too', () => {
+    applyLang('ar');
+    assertEqual(document.documentElement.dir, 'rtl');
+    const aboutText = $('about').textContent;
+    assert(/[\u0600-\u06FF]/.test(aboutText), 'About page should contain Arabic text when LANG=ar');
+    applyLang('en');
+    assertEqual(document.documentElement.dir, 'ltr');
+  });
+
+  /* ── 8. Security Helpers (XSS & CSV Injection) ── */
+  test('escapeHtml neutralizes script and HTML tag payloads', () => {
+    const raw = '<img src=x onerror="alert(1)"> & \'test\'';
+    const safe = escapeHtml(raw);
+    assert(!safe.includes('<') && !safe.includes('>'), 'Angle brackets must be escaped');
+    assert(safe.includes('&lt;img') && safe.includes('&quot;'), 'Entities should be escaped');
+  });
+
+  test('csvCell neutralizes spreadsheet formula injection and quotes commas', () => {
+    assertEqual(csvCell('=cmd|"/C calc"!A0'), '"\'=cmd|""/C calc""!A0"');
+    assertEqual(csvCell('+1+1'), "'+1+1");
+    assertEqual(csvCell('Cairo, Egypt'), '"Cairo, Egypt"');
+    assertEqual(csvCell('2023-10-18'), '2023-10-18');
+  });
+
+  /* ── 9. Large Dataset Stress Test (no stack overflow) ── */
+  test('Analytics handles 10,000 detections without stack overflow', () => {
+    const big = [];
+    for (let i = 0; i < 10000; i++) {
+      big.push({
+        id: i,
+        sensor: i % 3 === 0 ? 'MODIS' : 'VIIRS',
+        lat: 31.05,
+        lon: 31.38,
+        year: 2012 + (i % 13),
+        date: `${2012 + (i % 13)}-10-15`,
+        frp: 5.5
+      });
+    }
+    loadCustomFIRMS(big);
+    assert($('analytics').querySelectorAll('svg').length >= 3, 'All 3 analytics SVG charts should render');
+    resetToBenchmark();
+  });
+
+  /* ── Render Results ── */
+  const passed = results.filter(r => r.pass).length;
+  const failed = results.length - passed;
+  const summaryEl = document.getElementById('summary');
+  summaryEl.className = 'summary ' + (failed === 0 ? 'pass' : 'fail');
+  summaryEl.textContent = `TEST RESULT: ${passed}/${results.length} passed, ${failed} failed`;
+
+  const ul = document.getElementById('results');
+  results.forEach(r => {
+    const li = document.createElement('li');
+    li.className = r.pass ? 'pass' : 'fail';
+    li.textContent = (r.pass ? 'PASS: ' : 'FAIL: ') + r.name + (r.error ? ' — ' + r.error : '');
+    ul.appendChild(li);
+  });
+})();
+</script>
+</body>
+</html>

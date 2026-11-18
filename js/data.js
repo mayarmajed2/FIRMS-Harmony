@@ -307,61 +307,112 @@ function computeHarmonizationCalibration(dataset = DATA) {
   const modis = overlap.filter(d => d.sensor === 'MODIS');
   const viirs = overlap.filter(d => d.sensor === 'VIIRS');
 
-  const modisCount = modis.length || 1;
-  const viirsCount = viirs.length || 1;
-  const countRatio = +(viirsCount / modisCount).toFixed(2);
+  const modisCount = modis.length;
+  const viirsCount = viirs.length;
+  const hasBoth = modisCount > 0 && viirsCount > 0;
+
+  const countRatio = hasBoth ? +(viirsCount / modisCount).toFixed(2) : null;
 
   const modisTotalFrp = modis.reduce((s, d) => s + d.frp, 0);
   const viirsTotalFrp = viirs.reduce((s, d) => s + d.frp, 0);
-  const frpSumRatio = modisTotalFrp > 0 ? +(viirsTotalFrp / modisTotalFrp).toFixed(2) : 1.0;
+  const frpSumRatio = hasBoth && modisTotalFrp > 0 ? +(viirsTotalFrp / modisTotalFrp).toFixed(2) : null;
 
-  const modisMeanFrp = modisTotalFrp / modisCount;
-  const viirsMeanFrp = viirsTotalFrp / viirsCount;
-  const frpMeanRatio = modisMeanFrp > 0 ? +(viirsMeanFrp / modisMeanFrp).toFixed(2) : 1.0;
+  const modisMeanFrp = modisCount > 0 ? +(modisTotalFrp / modisCount).toFixed(2) : null;
+  const viirsMeanFrp = viirsCount > 0 ? +(viirsTotalFrp / viirsCount).toFixed(2) : null;
+  const frpMeanRatio = hasBoth && modisMeanFrp > 0 ? +(viirsMeanFrp / modisMeanFrp).toFixed(2) : null;
 
   return {
     overlapYears: '2012–2024',
     modisCount,
     viirsCount,
-    countRatio,      // Empirical count inflation factor of VIIRS vs MODIS
-    frpSumRatio,     // Total radiative energy capture ratio
-    frpMeanRatio,    // Average fire intensity ratio (VIIRS detects cooler/smaller burns)
-    modisMeanFrp: +modisMeanFrp.toFixed(2),
-    viirsMeanFrp: +viirsMeanFrp.toFixed(2)
+    countRatio,      // Empirical count inflation factor of VIIRS vs MODIS (null if single-sensor)
+    frpSumRatio,     // Total radiative energy capture ratio (null if single-sensor)
+    frpMeanRatio,    // Average fire intensity ratio (null if single-sensor)
+    modisMeanFrp,
+    viirsMeanFrp
   };
 }
 
 /**
- * Parse standard NASA FIRMS CSV export file
- * Compatible with MODIS (MOD14/MYD14) and VIIRS (VNP14IMGTDL / VJ114IMGTDL) CSV structures.
+ * RFC-4180 aware single CSV line splitter supporting quoted fields.
+ */
+function splitCSVLine(line) {
+  const out = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === ',' && !inQuotes) {
+      out.push(cur.trim());
+      cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur.trim());
+  return out;
+}
+
+/**
+ * Parse standard NASA FIRMS CSV export file.
+ * Compatible with MODIS (MOD14/MYD14) and VIIRS (VNP14IMGTDL / VJ114IMGTDL / VJ214IMGTDL) CSV structures.
  */
 function parseFIRMSCSV(csvText) {
-  const lines = csvText.trim().split(/\r?\n/);
+  if (typeof csvText !== 'string' || !csvText.trim()) {
+    throw new Error('File has no data rows');
+  }
+  const lines = csvText.trim().split(/\r?\n/).filter(l => l.trim().length > 0);
   if (lines.length < 2) throw new Error('File has no data rows');
 
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+  const headers = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/^['"]|['"]$/g, ''));
   const latIdx = headers.findIndex(h => h === 'latitude' || h === 'lat');
   const lonIdx = headers.findIndex(h => h === 'longitude' || h === 'lon');
   const frpIdx = headers.findIndex(h => h === 'frp');
   const dateIdx = headers.findIndex(h => h === 'acq_date' || h === 'date');
-  const timeIdx = headers.findIndex(h => h === 'acq_time' || h === 'time');
-  const confIdx = headers.findIndex(h => h === 'confidence' || h === 'conf');
-  const satIdx = headers.findIndex(h => h === 'satellite' || h === 'instrument' || h === 'sensor');
+  const instIdx = headers.findIndex(h => h === 'instrument' || h === 'sensor');
+  const satIdx = headers.findIndex(h => h === 'satellite');
+  const verIdx = headers.findIndex(h => h === 'version');
 
   if (latIdx === -1 || lonIdx === -1 || dateIdx === -1) {
     throw new Error('CSV must contain latitude, longitude, and acq_date columns.');
   }
 
+  const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
   const parsed = [];
   let skippedOutside = 0;
+  let skippedInvalid = 0;
 
   for (let i = 1; i < lines.length; i++) {
-    const row = lines[i].split(',').map(c => c.trim().replace(/['"]/g, ''));
-    if (row.length <= Math.max(latIdx, lonIdx, dateIdx)) continue;
+    const row = splitCSVLine(lines[i]).map(c => c.replace(/^['"]|['"]$/g, ''));
+    if (row.length <= Math.max(latIdx, lonIdx, dateIdx)) {
+      skippedInvalid++;
+      continue;
+    }
 
     const lat = parseFloat(row[latIdx]);
     const lon = parseFloat(row[lonIdx]);
-    if (isNaN(lat) || isNaN(lon)) continue;
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+      skippedInvalid++;
+      continue;
+    }
+
+    const dateStr = row[dateIdx];
+    if (!ISO_DATE_RE.test(dateStr)) {
+      skippedInvalid++;
+      continue;
+    }
+    const year = parseInt(dateStr.slice(0, 4), 10);
+    if (!Number.isInteger(year) || year < 1990 || year > 2100) {
+      skippedInvalid++;
+      continue;
+    }
 
     // Geographic boundary filter
     if (!inside(lat, lon)) {
@@ -369,18 +420,26 @@ function parseFIRMSCSV(csvText) {
       continue;
     }
 
-    const dateStr = row[dateIdx];
-    const year = parseInt(dateStr.split('-')[0], 10);
-    const frp = frpIdx !== -1 && !isNaN(parseFloat(row[frpIdx])) ? Math.max(0.1, parseFloat(row[frpIdx])) : 5.0;
+    const rawFrp = frpIdx !== -1 ? parseFloat(row[frpIdx]) : NaN;
+    const frp = Number.isFinite(rawFrp) && rawFrp >= 0 ? Math.max(0.1, rawFrp) : 5.0;
 
-    // Detect sensor type
+    // Detect sensor type: prioritize instrument/sensor column, then satellite code, then version
     let sensor = 'MODIS';
-    if (satIdx !== -1) {
-      const val = (row[satIdx] || '').toUpperCase();
-      if (val.includes('VIIRS') || val.includes('NPP') || val.includes('NOAA') || val.includes('N20') || val.includes('N21')) {
-        sensor = 'VIIRS';
-      }
-    } else if (frpIdx !== -1 && row[frpIdx] && (row.length > 10 && row[headers.indexOf('version')] === '2.0NRT')) {
+    const instVal = instIdx !== -1 ? (row[instIdx] || '').toUpperCase() : '';
+    const satVal = satIdx !== -1 ? (row[satIdx] || '').toUpperCase() : '';
+    const verVal = verIdx !== -1 ? (row[verIdx] || '').toUpperCase() : '';
+
+    if (instVal.includes('VIIRS')) {
+      sensor = 'VIIRS';
+    } else if (instVal.includes('MODIS')) {
+      sensor = 'MODIS';
+    } else if (
+      satVal === 'N' || satVal === '1' || satVal === '2' ||
+      satVal.includes('VIIRS') || satVal.includes('NPP') || satVal.includes('NOAA') ||
+      satVal.includes('N20') || satVal.includes('N21') || satVal.includes('J1') || satVal.includes('J2')
+    ) {
+      sensor = 'VIIRS';
+    } else if (verVal.includes('2.0NRT')) {
       sensor = 'VIIRS';
     }
 
@@ -395,7 +454,7 @@ function parseFIRMSCSV(csvText) {
     });
   }
 
-  return { parsed, skippedOutside };
+  return { parsed, skippedOutside, skippedInvalid };
 }
 
 /**

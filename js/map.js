@@ -6,11 +6,12 @@
 const RAMP = ['#3b1d7a', '#a3237e', '#e0432b', '#f08a3c', '#ffd36a', '#fff3c4'];
 const heat = frp => RAMP[Math.min(5, Math.floor(Math.sqrt(Math.max(0, frp) / 60) * 6))];
 
-let map, layer, selected = null;
+let map, layer, canvasRenderer = null, selected = null;
 let currentFiltered = [];
 let tlTimer = null;
 let tlPlaying = false;
-let tlYear = 2000;
+let tlYear = 2001;
+const CANVAS_MARKER_THRESHOLD = 1500;
 
 /* ══════════════════════════════════════════════════════════════════════════
    1. UI INJECTION & DOM SETUP
@@ -116,6 +117,9 @@ function initMap() {
   DELTA_LINES.forEach(line => L.polyline(line, nileStyle).addTo(map));
 
   layer = L.layerGroup().addTo(map);
+  if (typeof L.canvas === 'function') {
+    canvasRenderer = L.canvas({ padding: 0.5 });
+  }
 
   render();
 }
@@ -128,17 +132,30 @@ function setMapLabel() {
    3. MARKERS & SELECTION
    ══════════════════════════════════════════════════════════════════════════ */
 
-function markerFor(d) {
+function markerFor(d, useCanvas) {
   const modis = d.sensor === 'MODIS';
+  const title = t('marker_title')
+    .replace('{s}', d.sensor)
+    .replace('{d}', d.date)
+    .replace('{f}', d.frp);
+
+  if (useCanvas && canvasRenderer && typeof L.circleMarker === 'function') {
+    const color = heat(d.frp);
+    return L.circleMarker([d.lat, d.lon], {
+      renderer: canvasRenderer,
+      radius: modis ? 5 : 3.5,
+      color,
+      weight: 1,
+      fillColor: color,
+      fillOpacity: modis ? 0.55 : 0.9
+    }).on('click', () => { selected = d; renderInfo(); });
+  }
+
   const icon = L.divIcon({
     className: '',
     iconSize: modis ? [12, 12] : [9, 9],
     html: `<i class="mk ${modis ? 'mk-m' : 'mk-v'}" style="--c:${heat(d.frp)}"></i>`
   });
-  const title = t('marker_title')
-    .replace('{s}', d.sensor)
-    .replace('{d}', d.date)
-    .replace('{f}', d.frp);
 
   return L.marker([d.lat, d.lon], { icon, title, alt: title, keyboard: true })
     .on('click', () => { selected = d; renderInfo(); });
@@ -150,7 +167,7 @@ function renderInfo() {
   if (!infoEl) return;
 
   if (!d) {
-    infoEl.innerHTML = `<span class="hint">${t('hint')}</span>`;
+    infoEl.innerHTML = `<span class="hint">${escapeHtml(t('hint'))}</span>`;
     return;
   }
 
@@ -168,13 +185,20 @@ function renderInfo() {
     ? `🔎 ${nearby} رصدة مجاورة ضمن نطاق ~11 كم`
     : `🔎 ${nearby} nearby detection${nearby !== 1 ? 's' : ''} within ~11 km`;
 
+  const safeSensor = escapeHtml(d.sensor);
+  const safeDate = escapeHtml(d.date);
+  const safeLat = escapeHtml(d.lat);
+  const safeLon = escapeHtml(d.lon);
+  const safeFrp = escapeHtml(d.frp);
+  const safeId = escapeHtml(d.id);
+
   infoEl.innerHTML = `
-    <b><span style="color:${sensorColor}">${sensorSymbol}</span> ${t('d_det').replace('{s}', d.sensor)}</b><br>
-    ${t('d_date')}: <b>${d.date}</b><br>
-    ${t('d_pos')}: <b>${d.lat}°N, ${d.lon}°E</b><br>
-    ${t('d_frp')}: <span style="color:${heat(d.frp)};font-weight:700;">${d.frp} MW</span><br>
-    <span style="font-size:12px;color:var(--smoke);display:inline-block;margin-top:4px;">${nearbyText}</span><br>
-    <span class="note">${t('d_rec')}${d.id}</span>
+    <b><span style="color:${sensorColor}">${sensorSymbol}</span> ${escapeHtml(t('d_det').replace('{s}', d.sensor))}</b><br>
+    ${escapeHtml(t('d_date'))}: <b>${safeDate}</b><br>
+    ${escapeHtml(t('d_pos'))}: <b>${safeLat}°N, ${safeLon}°E</b><br>
+    ${escapeHtml(t('d_frp'))}: <span style="color:${heat(d.frp)};font-weight:700;">${safeFrp} MW</span><br>
+    <span style="font-size:12px;color:var(--smoke);display:inline-block;margin-top:4px;">${escapeHtml(nearbyText)}</span><br>
+    <span class="note">${escapeHtml(t('d_rec'))}${safeId}</span>
   `;
 }
 
@@ -215,7 +239,8 @@ function render() {
   if (!map || !layer) return;
 
   layer.clearLayers();
-  list.forEach(d => markerFor(d).addTo(layer));
+  const useCanvas = list.length > CANVAS_MARKER_THRESHOLD;
+  list.forEach(d => markerFor(d, useCanvas).addTo(layer));
 }
 
 function updateStats(list) {
@@ -270,7 +295,8 @@ function tlTick() {
 
   if (map && layer) {
     layer.clearLayers();
-    list.forEach(d => markerFor(d).addTo(layer));
+    const useCanvas = list.length > CANVAS_MARKER_THRESHOLD;
+    list.forEach(d => markerFor(d, useCanvas).addTo(layer));
   }
 
   updateStats(list);
@@ -315,7 +341,7 @@ function exportCSV() {
   currentFiltered.forEach(d => {
     rows.push([d.id, d.sensor, d.lat, d.lon, d.date, d.year, d.frp]);
   });
-  const csvContent = rows.map(r => r.join(',')).join('\n');
+  const csvContent = rows.map(r => r.map(csvCell).join(',')).join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -332,16 +358,40 @@ function exportCSV() {
    7. INITIALIZATION & LISTENERS
    ══════════════════════════════════════════════════════════════════════════ */
 
-function initFilters() {
+function syncYearDropdowns() {
   const y0 = $('y0'), y1 = $('y1');
-  if (y0 && y1 && y0.options.length === 0) {
-    for (let y = 2001; y <= 2024; y++) {
-      y0.add(new Option(y, y));
-      y1.add(new Option(y, y));
+  if (!y0 || !y1) return;
+
+  let minY = 2001, maxY = 2024;
+  if (typeof DATA !== 'undefined' && Array.isArray(DATA) && DATA.length) {
+    minY = Infinity;
+    maxY = -Infinity;
+    for (let i = 0; i < DATA.length; i++) {
+      const y = DATA[i].year;
+      if (Number.isInteger(y)) {
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
     }
-    y0.value = 2001;
-    y1.value = 2024;
+    if (!Number.isFinite(minY) || !Number.isFinite(maxY)) {
+      minY = 2001;
+      maxY = 2024;
+    }
   }
+
+  y0.innerHTML = '';
+  y1.innerHTML = '';
+  for (let y = minY; y <= maxY; y++) {
+    y0.add(new Option(y, y));
+    y1.add(new Option(y, y));
+  }
+  y0.value = minY;
+  y1.value = maxY;
+  tlYear = minY;
+}
+
+function initFilters() {
+  syncYearDropdowns();
 
   ['fM', 'fV', 'y0', 'y1', 'frp'].forEach(id => {
     const el = $(id);
@@ -362,15 +412,26 @@ if (document.readyState === 'loading') {
 
 document.addEventListener('langchange', () => {
   const btn = $('tlPlay');
-  if (btn) btn.textContent = tlPlaying ? t('pause', '⏸ Pause') : t('play', '▶ Play');
+  if (btn) {
+    btn.textContent = tlPlaying ? t('pause', '⏸ Pause') : t('play', '▶ Play');
+    btn.setAttribute('aria-label', tlPlaying
+      ? (LANG === 'ar' ? 'إيقاف العرض الزمني مؤقتاً' : 'Pause time-lapse animation')
+      : (LANG === 'ar' ? 'تشغيل العرض الزمني' : 'Play time-lapse animation'));
+  }
   const csvBtn = $('csvBtn');
-  if (csvBtn) csvBtn.textContent = t('download_csv', '⬇ Export Filtered CSV');
+  if (csvBtn) {
+    csvBtn.textContent = t('download_csv', '⬇ Export Filtered CSV');
+    csvBtn.setAttribute('aria-label', LANG === 'ar' ? 'تصدير الرصدات المصفاة بصيغة CSV' : 'Export filtered detections as CSV');
+  }
   render();
   renderInfo();
   setMapLabel();
 });
 
 document.addEventListener('dataupdated', () => {
+  if (tlPlaying) tlStop();
+  selected = null;
+  syncYearDropdowns();
   render();
   renderInfo();
 });
