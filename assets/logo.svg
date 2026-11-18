@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <!-- Background subtle radial glow -->
+    <radialGradient id="orbitGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff5a4a" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#17110c" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Fire Flame Dual Gradient (MODIS Ember to VIIRS Blaze) -->
+    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#e0432b"/>
+      <stop offset="55%" stop-color="#f08a3c"/>
+      <stop offset="100%" stop-color="#ffd36a"/>
+    </linearGradient>
+    <!-- Inner Flame Gradient -->
+    <linearGradient id="innerFlame" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ffd36a"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <!-- Nile River Delta Turquoise Gradient -->
+    <linearGradient id="nileGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3cc9b6"/>
+      <stop offset="100%" stop-color="#1f7a78"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient Glow -->
+  <circle cx="24" cy="24" r="22" fill="url(#orbitGlow)"/>
+
+  <!-- Orbital Satellite Track Ring -->
+  <ellipse cx="24" cy="24" rx="21" ry="9" fill="none" stroke="url(#nileGrad)" stroke-width="1.8" stroke-dasharray="3.5 2" transform="rotate(-28 24 24)"/>
+
+  <!-- Satellite Sensor Node (MODIS/VIIRS Earth Observation Orb) -->
+  <circle cx="41.5" cy="15" r="2.8" fill="#ffd36a" stroke="#17110c" stroke-width="1.2"/>
+  <!-- Solar Panel wings for satellite -->
+  <line x1="37" y1="13.5" x2="46" y2="16.5" stroke="#3cc9b6" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Harmonized Dual Flame (Symbolizing Multi-Sensor Thermal Calibration) -->
+  <!-- Outer Thermal Anomaly Envelope -->
+  <path d="M24 6 C24 6 15 17 15 26 C15 32 19 37 24 37 C29 37 33 32 33 26 C33 17 24 6 24 6 Z"
+        fill="url(#fireGrad)"/>
+
+  <!-- Stylized Nile River Valley Curving through the Fire Core -->
+  <path d="M24 37 C22 32 26 27 24 22 C23 19 24.5 16 24 13"
+        fill="none" stroke="#14323a" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M24 37 C22 32 26 27 24 22 C23 19 24.5 16 24 13"
+        fill="none" stroke="url(#nileGrad)" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Inner Radiant Heat Core (High FRP Focal Point) -->
+  <path d="M24 23 C21.5 27 21 29 21 32 C21 34.5 22.5 36 24 36 C25.5 36 27 34.5 27 32 C27 29 26.5 27 24 23 Z"
+        fill="url(#innerFlame)" opacity="0.9"/>
+</svg>

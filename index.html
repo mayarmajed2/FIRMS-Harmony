@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FIRE HARMONY: fire activity along the Nile</title>
+<meta name="description" content="Satellite fire monitoring along the Nile Valley and Delta in Egypt, comparing MODIS and VIIRS observations.">
+<meta name="theme-color" content="#17110c">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&family=DM+Sans:wght@400;500;600&family=Fraunces:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="home">
+<a class="skip" id="skip" href="#main" data-i18n="skip"></a>
+<header><div class="bar">
+  <a class="logo" href="#home">
+    <img src="assets/logo.svg" alt="Fire Harmony Logo" class="logo-img" width="34" height="34">
+    <span>Fire <b>Harmony</b></span>
+  </a>
+  <button id="lang" class="lang" type="button" data-i18n-aria="lang_aria">العربية</button>
+  <nav id="nav" data-i18n-aria="nav_aria">
+    <a href="#home" data-i18n="nav_home"></a>
+    <a href="#map" data-i18n="nav_map"></a>
+    <a href="#analytics" data-i18n="nav_analytics"></a>
+    <a href="#sensors" data-i18n="nav_sensors"></a>
+    <a href="#methodology" data-i18n="nav_method"></a>
+    <a href="#about" data-i18n="nav_about"></a>
+  </nav>
+</div></header>
+
+<main id="main" tabindex="-1">
+<div class="bgimg" aria-hidden="true"></div>
+
+<!-- HOME -->
+<div class="page" id="home">
+  <div class="wrap">
+    <div class="hero"><div>
+      <h1>Fire Harmony</h1>
+      <p class="lead" data-i18n="lead"></p>
+      <a class="cta" href="#map"><span data-i18n="cta"></span><span class="arr" aria-hidden="true">→</span></a>
+      <a class="sub" href="#methodology" data-i18n="how2012"></a>
+      <div class="stats" id="stats"></div>
+      <p class="note note--gap" data-i18n="demo_note"></p>
+    </div>
+    <div id="heroSvg"></div></div>
+
+    <div class="sec">
+      <h2 data-i18n="s_title"></h2>
+      <p class="intro" data-i18n="s_intro"></p>
+      <div class="sensors">
+        <div><em data-i18n="since2000"></em><h3>MODIS</h3><p class="big" data-i18n="res_m"></p><p data-i18n="modis_txt"></p></div>
+        <div><em data-i18n="since2012"></em><h3>VIIRS</h3><p class="big" data-i18n="res_v"></p><p data-i18n="viirs_txt"></p></div>
+      </div>
+    </div>
+  </div>
+  <section class="band"><div class="wrap why">
+    <h2 data-i18n="why"></h2>
+    <div>
+      <h3 data-i18n="w1h"></h3><p data-i18n="w1p"></p>
+      <h3 data-i18n="w2h"></h3><p data-i18n="w2p"></p>
+      <h3 data-i18n="w3h"></h3><p data-i18n="w3p"></p>
+    </div>
+  </div></section>
+</div>
+
+<!-- MAP -->
+<div class="page" id="map"><div class="wrap"><h1 class="sr-only" data-i18n="nav_map"></h1><div class="mapgrid">
+  <aside class="panel">
+    <h2 data-i18n="f_title"></h2>
+    <label><input type="checkbox" id="fM" checked> <span data-i18n="f_modis"></span></label>
+    <label><input type="checkbox" id="fV" checked> <span data-i18n="f_viirs"></span></label>
+    <div class="row" data-i18n="f_date"></div>
+    <div class="yrs"><select id="y0" data-i18n-aria="y_from"></select><select id="y1" data-i18n-aria="y_to"></select></div>
+    <div class="row"><span data-i18n="f_frp"></span> <b id="frpv">0 MW</b></div>
+    <input type="range" id="frp" min="0" max="60" value="0" data-i18n-aria="f_frp">
+    <div class="row" id="count" role="status"></div>
+    <div class="row" data-i18n="f_scale"></div>
+    <div class="ramp"></div>
+    <div class="lg"><span data-i18n="low"></span><span data-i18n="high"></span></div>
+    <p class="note note--gap" data-i18n="legend"></p>
+    <p class="note" data-i18n="f_demo"></p>
+  </aside>
+  <div class="mapbox"><div id="mapCanvas"></div></div>
+  <div class="panel" id="info" aria-live="polite"></div>
+</div></div></div>
+
+<!-- COMING NEXT -->
+<div class="page" id="analytics"><div class="wrap soon"><h1 class="page-title" data-i18n="an_h"></h1><p data-i18n="an_p"></p></div></div>
+<div class="page" id="sensors"><div class="wrap soon"><h1 class="page-title" data-i18n="se_h"></h1><p data-i18n="se_p"></p></div></div>
+<div class="page" id="methodology"><div class="wrap soon"><h1 class="page-title" data-i18n="me_h"></h1><p data-i18n="me_p"></p></div></div>
+<div class="page" id="about"><div class="wrap soon"><h1 class="page-title" data-i18n="ab_h"></h1><p data-i18n="ab_p"></p></div></div>
+</main>
+
+<footer data-i18n="footer"></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/home.js"></script>
+<script src="js/map.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/sensors.js"></script>
+<script src="js/methodology.js"></script>
+<script src="js/about.js"></script>
+<script src="js/router.js"></script>
+</body>
+</html>
