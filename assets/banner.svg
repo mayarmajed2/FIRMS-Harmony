@@ -47,15 +47,17 @@
     <line x1="960" y1="0" x2="960" y2="300"/>
   </g>
 
-  <!-- Left Emblem -->
-  <g transform="translate(86, 66) scale(3.5)">
-    <ellipse cx="24" cy="24" rx="21" ry="9" fill="none" stroke="url(#nileGrad)" stroke-width="1.6" stroke-dasharray="3.5 2" transform="rotate(-28 24 24)"/>
-    <circle cx="41.5" cy="15" r="2.6" fill="#ffd36a" stroke="#17110c" stroke-width="1.1"/>
-    <line x1="37" y1="13.5" x2="46" y2="16.5" stroke="#3cc9b6" stroke-width="1.4" stroke-linecap="round"/>
-    <path d="M24 6 C24 6 15 17 15 26 C15 32 19 37 24 37 C29 37 33 32 33 26 C33 17 24 6 24 6 Z" fill="url(#fireGrad)"/>
-    <path d="M24 37 C22 32 26 27 24 22 C23 19 24.5 16 24 13" fill="none" stroke="#14323a" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M24 37 C22 32 26 27 24 22 C23 19 24.5 16 24 13" fill="none" stroke="url(#nileGrad)" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M24 23 C21.5 27 21 29 21 32 C21 34.5 22.5 36 24 36 C25.5 36 27 34.5 27 32 C27 29 26.5 27 24 23 Z" fill="#fff3c4" opacity="0.9"/>
+  <!-- Left Emblem (matches assets/logo.svg) -->
+  <g transform="translate(80, 62) scale(2.75)">
+    <rect x="2" y="2" width="60" height="60" rx="16" fill="#17110c" stroke="url(#accentLine)" stroke-opacity="0.7" stroke-width="1.4"/>
+    <path d="M 10 42 C 7 33, 18 20, 34 15 C 45 11.5, 55 13, 55 19" fill="none" stroke="#3cc9b6" stroke-opacity="0.32" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 32.5 11 C 32.5 11, 45.5 22.5, 45.5 34.8 C 45.5 43.2, 39.5 49.5, 32 49.5 C 24.5 49.5, 18.5 43.2, 18.5 34.8 C 18.5 27.6, 23.2 21.8, 25.4 18.8 C 25.6 22.4, 27.4 24.3, 28.8 24.8 C 28.2 19.2, 30.2 14.3, 32.5 11 Z" fill="url(#fireGrad)"/>
+    <path d="M 32 25.5 C 32 25.5, 39 32, 39 38.5 C 39 43.2, 35.9 46.8, 32 46.8 C 28.1 46.8, 25 43.2, 25 38.5 C 25 32.8, 32 25.5, 32 25.5 Z" fill="#fff3c4" opacity="0.9"/>
+    <path d="M 32 51.5 C 29.8 47.2, 34.4 43.2, 32 38.5 C 31.3 37.1, 29.5 34.8, 27.2 32.6 M 32 38.5 C 33.4 36.2, 35.1 34.2, 37.2 32.2" fill="none" stroke="#142b30" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 32 51.5 C 29.8 47.2, 34.4 43.2, 32 38.5 C 31.3 37.1, 29.5 34.8, 27.2 32.6 M 32 38.5 C 33.4 36.2, 35.1 34.2, 37.2 32.2" fill="none" stroke="url(#nileGrad)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 55 19 C 56 26, 44 37.5, 28 43.5 C 18 47.2, 11.5 46.8, 10 42" fill="none" stroke="url(#nileGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="51.2" cy="17.2" r="5.2" fill="#ffd36a" opacity="0.24"/>
+    <circle cx="51.2" cy="17.2" r="3" fill="#ffe07d" stroke="#17110c" stroke-width="1.2"/>
   </g>
 
   <!-- Title & Tagline -->
