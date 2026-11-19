@@ -282,6 +282,7 @@ $$\text{FRP} = \frac{A_{\text{pix}} \cdot \sigma}{a} \left(T_4^4 - T_{4,\text{bg
 
 | Guide | What's Inside |
 | :--- | :--- |
+| [FIRMS_Harmony_Project_Overview.pdf](docs/FIRMS_Harmony_Project_Overview.pdf) | **8-page executive & technical PDF report** (problem, pipeline, validation, features & results) |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Event bus, module lifecycles, spatial engine & rendering pipeline |
 | [INSTALLATION.md](docs/INSTALLATION.md) | Local server setup, browser requirements & verification checklist |
 | [USER_GUIDE.md](docs/USER_GUIDE.md) | Step-by-step feature walkthrough, CSV uploads & Arabic RTL mode |
