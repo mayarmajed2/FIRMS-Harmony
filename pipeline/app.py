@@ -531,27 +531,27 @@ class Handler(BaseHTTPRequestHandler):
                 area = area_from_query(params)
                 scale = params.get('scale', ['harmonized'])[0]
                 platform = params.get('platform', ['snpp'])[0]
-                year = int(params.get('year', ['2023'])[0])
-                month = int(params.get('month', ['9'])[0])
+                year = max(MIN_YEAR, min(MAX_YEAR, int(params.get('year', ['2023'])[0])))
+                month = max(1, min(12, int(params.get('month', ['9'])[0])))
                 return self.send_json({'area': area_public(area), **compare_for_area(area, scale, platform, year, month)})
             if path == '/api/disagreement':
                 area = area_from_query(params)
-                year = int(params.get('year', ['2023'])[0])
-                month = int(params.get('month', ['9'])[0])
+                year = max(MIN_YEAR, min(MAX_YEAR, int(params.get('year', ['2023'])[0])))
+                month = max(1, min(12, int(params.get('month', ['9'])[0])))
                 return self.send_json(disagreement_for_area(area, year, month))
             if path == '/api/map':
                 area = area_from_query(params)
                 scale = params.get('scale', ['harmonized'])[0]
                 platform = params.get('platform', ['snpp'])[0]
-                year = int(params.get('year', ['2023'])[0])
-                month = int(params.get('month', ['9'])[0])
+                year = max(MIN_YEAR, min(MAX_YEAR, int(params.get('year', ['2023'])[0])))
+                month = max(1, min(12, int(params.get('month', ['9'])[0])))
                 return self.send_json({'area': area_public(area), **map_for_area(area, scale, platform, year, month)})
             if path == '/api/download':
                 kind = params.get('kind', ['monthly'])[0]
                 area = area_from_query(params)
                 if kind == 'detections':
-                    start_year = int(params.get('start_year', [str(MAX_YEAR - 1)])[0])
-                    end_year = int(params.get('end_year', [str(start_year)])[0])
+                    start_year = max(MIN_YEAR, min(MAX_YEAR, int(params.get('start_year', [str(MAX_YEAR - 1)])[0])))
+                    end_year = max(start_year, min(MAX_YEAR, int(params.get('end_year', [str(start_year)])[0])))
                     start_month = f'{start_year:04d}-01'
                     end_month = f'{end_year:04d}-12'
                     text = detections_csv(area, start_month, end_month)
@@ -559,8 +559,8 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     scale = params.get('scale', ['harmonized'])[0]
                     platform = params.get('platform', ['snpp'])[0]
-                    start_year = int(params.get('start_year', [str(MIN_YEAR)])[0])
-                    end_year = int(params.get('end_year', [str(MAX_YEAR)])[0])
+                    start_year = max(MIN_YEAR, min(MAX_YEAR, int(params.get('start_year', [str(MIN_YEAR)])[0])))
+                    end_year = max(start_year, min(MAX_YEAR, int(params.get('end_year', [str(MAX_YEAR)])[0])))
                     text = monthly_csv(area, scale, platform, start_year, end_year)
                     filename = f'delta_calendar_{area["id"]}_{scale}_{start_year}_{end_year}.csv'
                 data, content_type, filename = csv_response(text, filename)
@@ -584,7 +584,8 @@ class Handler(BaseHTTPRequestHandler):
         content_type = {
             '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
             '.js': 'application/javascript; charset=utf-8', '.svg': 'image/svg+xml',
-            '.json': 'application/json; charset=utf-8',
+            '.json': 'application/json; charset=utf-8', '.ico': 'image/x-icon',
+            '.png': 'image/png',
         }.get(candidate.suffix.lower(), 'application/octet-stream')
         self.send_bytes(candidate.read_bytes(), content_type)
 

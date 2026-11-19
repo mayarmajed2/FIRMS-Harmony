@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Delta Fire Calendar: a reproducible MODIS and VIIRS hotspot calendar and harmonisation audit for the Nile Delta.">
+  <title>Delta Fire Calendar | NASA FIRMS harmonisation</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050a14'/%3E%3Cellipse cx='32' cy='32' rx='26' ry='12' transform='rotate(-26 32 32)' fill='none' stroke='%2338bdf8' stroke-width='2.2' opacity='.75'/%3E%3Cpath d='M32 9c6 10-5 14 0 23 4-5 6-8 6-12 7 6 10 13 10 20a16 16 0 0 1-32 0c0-6 4-11 8-16 0 6 3 9 6 11-4-9 1-18 2-26Z' fill='%23f97316'/%3E%3Cpath d='M16 47c5-3 11-3 16 0s11 3 16 0' fill='none' stroke='%232dd4bf' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <canvas id="cosmos-canvas" class="cosmos-canvas" aria-hidden="true"></canvas>
+  <div class="ambient-aurora" aria-hidden="true"></div>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-emblem" aria-hidden="true">
+          <svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="Delta Fire Calendar orbital emblem">
+            <defs>
+              <linearGradient id="flame-grad" x1="20" y1="8" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="40%" stop-color="#fb923c"/>
+                <stop offset="78%" stop-color="#ea580c"/>
+                <stop offset="100%" stop-color="#991b1b"/>
+              </linearGradient>
+              <linearGradient id="nile-grad" x1="12" y1="42" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="50%" stop-color="#2dd4bf"/>
+                <stop offset="100%" stop-color="#10b981"/>
+              </linearGradient>
+              <linearGradient id="orbit-grad" x1="4" y1="18" x2="60" y2="46" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95"/>
+                <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#f97316" stop-opacity="0.9"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="29" fill="rgba(7, 15, 30, 0.85)" stroke="rgba(56, 189, 248, 0.24)" stroke-width="1"/>
+            <g class="emblem-orbit">
+              <ellipse cx="32" cy="32" rx="26" ry="11.5" transform="rotate(-24 32 32)" fill="none" stroke="url(#orbit-grad)" stroke-width="1.6" stroke-dasharray="4 3"/>
+              <circle class="emblem-sat" cx="55.5" cy="21.5" r="2.7" fill="#38bdf8"/>
+            </g>
+            <path class="emblem-flame" d="M32 9c5.2 8.2-4.2 12.2 0 19.6 3.2-4.2 5.1-7 5.2-10.4 6 5.2 9 11.4 9 17.4a14.2 14.2 0 0 1-28.4 0c0-5.4 3.2-9.6 7.2-13.6 0 5.1 2.2 8.2 5.2 9.4-3-8 1-15.4 1.8-22.4Z" fill="url(#flame-grad)"/>
+            <path class="emblem-core" d="M32 23c2.4 4.2-1.8 6.4 0 10.6 2-2 3-3.8 3.1-5.6 2.8 2.6 4.1 5.6 4.1 8.8a7.2 7.2 0 0 1-14.4 0c0-3 1.6-5.4 3.8-7.4 0 2.6 1.1 4.2 2.6 4.9-1.4-4 .4-7.8.8-11.3Z" fill="#fef9c3" opacity="0.72"/>
+            <path class="emblem-river" d="M32 54V46m0 0c-3.5-2.6-8.4-3.6-14-3.2M32 46c3.5-2.6 8.4-3.6 14-3.2" fill="none" stroke="url(#nile-grad)" stroke-width="2.4" stroke-linecap="round"/>
+            <path class="emblem-wave" d="M16 50.5c5.2-2.2 10.8-2.2 16 0s10.8 2.2 16 0" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" opacity="0.88"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="mission-kicker">
+            <span class="mission-dot"></span>
+            <span>NASA SPACE APPS 2026</span>
+            <span class="kicker-sep">·</span>
+            <span class="kicker-nile">NILE DELTA</span>
+          </div>
+          <h1>Delta Fire Calendar</h1>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <span class="pill pill-loading" id="loading-pill" hidden><span class="spinner" aria-hidden="true"></span>Updating…</span>
+        <span class="pill pill-archive" id="archive-status">Loading archive…</span>
+        <nav class="top-nav" aria-label="Page sections">
+          <a class="top-link" href="#spatial-section">Map</a>
+          <a class="top-link" href="#calendar-section">Calendar</a>
+          <a class="top-link" href="#disagreement-section">Sensors</a>
+          <a class="top-link" href="#methodology">Method</a>
+          <a class="top-link" href="#downloads">Data</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="Calendar selection controls">
+      <div class="controls-row-top">
+        <div class="control control-area">
+          <label for="area-select">Study area</label>
+          <select id="area-select"></select>
+        </div>
+
+        <div class="control control-date">
+          <span class="control-label">Timeline &amp; Time-lapse</span>
+          <div class="date-cluster">
+            <button type="button" class="icon-btn" id="play-prev" title="Previous step (←)" aria-label="Previous step">◀</button>
+            <select id="month-select" aria-label="Month"></select>
+            <select id="year-select" aria-label="Year"></select>
+            <button type="button" class="icon-btn" id="play-next" title="Next step (→)" aria-label="Next step">▶</button>
+            <button type="button" class="play-btn" id="play-toggle" aria-pressed="false" title="Play or pause time-lapse (Space)">
+              <span id="play-icon" aria-hidden="true">▶</span>
+              <span id="play-label">Play</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control control-scale">
+          <span class="control-label">Scale</span>
+          <div class="segmented" id="scale-group" role="group" aria-label="Value scale">
+            <button type="button" data-scale="harmonized" aria-pressed="true">Harmonised</button>
+            <button type="button" data-scale="snpp_era" aria-pressed="false">S-NPP era</button>
+            <button type="button" data-scale="raw" aria-pressed="false">Raw</button>
+          </div>
+        </div>
+
+        <div class="control control-reset">
+          <span class="control-label">&nbsp;</span>
+          <button type="button" class="primary-button" id="reset-demo">Demo view</button>
+        </div>
+      </div>
+
+      <div class="controls-row-bottom">
+        <div class="sensor-dock" id="constellation-bar" role="group" aria-label="Select satellite sensor">
+          <span class="dock-label">Satellite</span>
+          <button type="button" class="sat-btn" data-platform="terra" aria-pressed="false" title="Inspect raw MODIS Terra detections (2000-11 → 2025-12)"><i></i>Terra</button>
+          <button type="button" class="sat-btn" data-platform="aqua" aria-pressed="false" title="Inspect raw MODIS Aqua detections (2002-07 → 2025-12)"><i></i>Aqua</button>
+          <button type="button" class="sat-btn" data-platform="snpp" aria-pressed="false" title="Inspect VIIRS Suomi-NPP reference detections (2012-02 → 2025-12)"><i></i>S-NPP</button>
+          <button type="button" class="sat-btn" data-platform="noaa20" aria-pressed="false" title="Inspect raw VIIRS NOAA-20 detections (2018-04 → 2025-12)"><i></i>NOAA-20</button>
+          <span class="sensor-hint" id="sensor-hint">Active in harmonised era</span>
+        </div>
+
+        <div class="dock-tools">
+          <div class="play-extras" id="play-extras">
+            <select id="play-mode" class="mini-select" aria-label="Time-lapse step mode" title="Time-lapse step mode">
+              <option value="yearly">Yearly · same month</option>
+              <option value="monthly">Month by month</option>
+            </select>
+            <button type="button" class="mini-pill-btn" id="play-speed" title="Toggle playback speed">1×</button>
+            <span class="play-status" id="play-status" hidden></span>
+          </div>
+
+          <select id="preset-select" class="mini-select preset-select" aria-label="Verified demo scenarios" title="Jump to a verified demo scenario">
+            <option value="">Verified views…</option>
+            <option value="demo">Sep 2023 · Verified Demo</option>
+            <option value="oct2023">Oct 2023 · Contrast (−21.8%)</option>
+            <option value="west_mix">West Delta · Mixed Era Sign Flip</option>
+            <option value="noaa20_raw">NOAA-20 Raw · Calibration Failed</option>
+            <option value="missing_2026">Sep 2026 · Explicitly Missing</option>
+          </select>
+
+          <button type="button" class="mini-pill-btn" id="custom-toggle" aria-expanded="false" aria-controls="custom-panel">Draw box</button>
+        </div>
+      </div>
+
+      <!-- Synced hidden select kept for programmatic compatibility -->
+      <select id="platform-select" class="sr-only" aria-hidden="true" tabindex="-1">
+        <option value="terra">MODIS Terra</option>
+        <option value="aqua">MODIS Aqua</option>
+        <option value="snpp">VIIRS S-NPP</option>
+        <option value="noaa20">VIIRS NOAA-20</option>
+      </select>
+    </section>
+
+    <div class="custom-panel" id="custom-panel" hidden>
+      <div class="custom-fields">
+        <label>West (°E)<input type="number" id="custom-west" min="29.5" max="32.25" step="0.25" value="29.5"></label>
+        <label>South (°N)<input type="number" id="custom-south" min="29.8" max="31.4" step="0.25" value="29.8"></label>
+        <label>East (°E)<input type="number" id="custom-east" min="29.75" max="32.5" step="0.25" value="32.5"></label>
+        <label>North (°N)<input type="number" id="custom-north" min="30.05" max="31.65" step="0.25" value="31.65"></label>
+        <button type="button" class="primary-button" id="custom-apply">Apply rectangle</button>
+        <button type="button" class="ghost-button" id="custom-clear">Back to full Delta</button>
+      </div>
+      <p class="custom-note">Custom rectangles show raw counts only (calibration was validated for the five preset areas). You can also drag directly on the Nile Delta map.</p>
+    </div>
+
+    <main id="main">
+      <section class="kpis" aria-label="Selected month summary">
+        <article class="kpi kpi-fire" data-spotlight>
+          <div class="kpi-head">
+            <p class="kpi-label">Selected month</p>
+            <span class="kpi-glyph glyph-fire" aria-hidden="true">
+              <svg viewBox="0 0 20 20"><path d="M10.5 2.2c2.1 3.2-1.8 5 0 8 1.3-1.6 2-2.8 2.1-4.1 2.4 2.1 3.7 4.6 3.7 7a6.3 6.3 0 0 1-12.6 0c0-2.3 1.3-4.1 3-5.8 0 2 .9 3.4 2.1 3.9-1.2-3.2.4-6.2.7-9Z" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <p class="kpi-value" id="kpi-value">—</p>
+          <p class="kpi-sub" id="kpi-value-sub">Hotspot detections</p>
+          <div id="kpi-value-status" class="badge-row"></div>
+        </article>
+
+        <article class="kpi kpi-anomaly" data-spotlight>
+          <div class="kpi-head">
+            <p class="kpi-label">Vs prior median</p>
+            <span class="kpi-glyph glyph-anomaly" aria-hidden="true">
+              <svg viewBox="0 0 20 20"><path d="M3 14.5 7.5 10l3.2 2.8L17 5.5m0 0h-4.2m4.2 0v4.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <p class="kpi-value" id="kpi-anomaly">—</p>
+          <p class="kpi-sub" id="kpi-anomaly-sub">Same calendar month</p>
+          <div id="kpi-anomaly-detail" class="kpi-detail"></div>
+        </article>
+
+        <article class="kpi kpi-nile" data-spotlight>
+          <div class="kpi-head">
+            <p class="kpi-label">Data completeness</p>
+            <span class="kpi-glyph glyph-nile" aria-hidden="true">
+              <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.8 10.2 9 12.4l4.4-4.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <p class="kpi-value kpi-value-small" id="kpi-quality">—</p>
+          <p class="kpi-sub" id="kpi-quality-sub">Input completeness</p>
+          <div class="quality-meter" aria-hidden="true"><span id="kpi-quality-bar"></span></div>
+          <div id="kpi-quality-detail" class="kpi-detail"></div>
+        </article>
+
+        <article class="kpi kpi-nasa" data-spotlight>
+          <div class="kpi-head">
+            <p class="kpi-label">Archive scope</p>
+            <span class="kpi-glyph glyph-nasa" aria-hidden="true">
+              <svg viewBox="0 0 20 20"><ellipse cx="10" cy="10" rx="8" ry="3.8" transform="rotate(-28 10 10)" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.6" fill="currentColor"/><circle cx="16.2" cy="6.6" r="1.4" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <p class="kpi-value kpi-value-small" id="kpi-coverage">—</p>
+          <p class="kpi-sub" id="kpi-coverage-sub">Local verified archive</p>
+          <div id="kpi-coverage-detail" class="kpi-detail"></div>
+        </article>
+      </section>
+
+      <div class="grid-two" id="spatial-section">
+        <section class="panel map-panel reveal" aria-labelledby="map-title">
+          <div class="panel-head">
+            <div>
+              <h2 id="map-title">Spatial pattern · Nile Delta</h2>
+              <p id="map-sub">0.25° cells for the selected platform and month.</p>
+            </div>
+            <div class="panel-head-actions">
+              <button type="button" class="mini-pill-btn active" id="nile-overlay-toggle" aria-pressed="true" title="Toggle Nile River, coast &amp; orbital sweep overlay">Nile overlay</button>
+              <button type="button" class="mini-pill-btn" id="map-reset-box" hidden title="Return to Full Nile Delta">Reset box</button>
+              <span class="pill pill-thermal" id="map-factor">—</span>
+            </div>
+          </div>
+          <div class="map-wrap">
+            <div class="map-scanline" id="map-scanline" aria-hidden="true"></div>
+            <svg id="map-svg" viewBox="0 0 760 520" role="img" aria-label="North-up grid map of hotspot detections across the Nile Delta"></svg>
+          </div>
+          <div class="map-footer">
+            <div class="map-info" id="map-info">Hover any cell for telemetry · drag on the map to draw a custom box.</div>
+            <div class="legend legend-fire" aria-hidden="true">
+              <span>Low</span><i class="gradient-fire"></i><span>Peak</span>
+            </div>
+          </div>
+          <p class="scope-inline" id="scope-note">Loading the local NASA FIRMS archive…</p>
+        </section>
+
+        <section class="panel compare-panel reveal" aria-labelledby="compare-title">
+          <div class="panel-head">
+            <div>
+              <h2 id="compare-title">Selected month vs history</h2>
+              <p id="compare-sub">Consistent scale, prior complete years only.</p>
+            </div>
+            <span class="pill pill-orbit" id="compare-period">—</span>
+          </div>
+          <div id="compare-body"></div>
+          <div class="chart-wrap">
+            <svg id="compare-chart" viewBox="0 0 520 275" role="img" aria-label="Historical comparison chart"></svg>
+          </div>
+          <details class="years-drawer" id="years-drawer">
+            <summary id="years-summary">Inspect prior baseline years</summary>
+            <div class="chips" id="compare-chips"></div>
+          </details>
+          <div class="warnings" id="compare-warnings"></div>
+        </section>
+      </div>
+
+      <section class="panel calendar-panel reveal" id="calendar-section" aria-labelledby="calendar-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="calendar-title">Year-by-month calendar · 2000–2026</h2>
+            <p>Click any cell, year, or month column to inspect it. Shared thermal scale across the visible record.</p>
+          </div>
+          <div class="legend legend-status" aria-label="Cell status legend">
+            <span><i class="dot dot-observed"></i>Observed</span>
+            <span><i class="dot dot-validated_period"></i>Calibrated</span>
+            <span><i class="dot dot-extrapolated"></i>Extrapolated</span>
+            <span><i class="dot dot-raw_only"></i>Raw only</span>
+            <span><i class="dot dot-partial_input"></i>Partial</span>
+            <span><i class="dot dot-missing_input"></i>Missing</span>
+          </div>
+        </div>
+        <div class="calendar-scroll">
+          <table class="calendar" id="calendar-table">
+            <caption class="sr-only">Monthly hotspot calendar, 2000 to 2026</caption>
+          </table>
+        </div>
+        <p class="footnote" id="calendar-note">A zero can be a complete month with no detections or a failed input; the cell status distinguishes them.</p>
+      </section>
+
+      <section class="panel disagreement-panel reveal" id="disagreement-section" aria-labelledby="disagreement-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="disagreement-title">Aqua vs S-NPP detection disagreement</h2>
+            <p id="disagreement-sub">Same 0.25° cells and UTC calendar days, paired by month.</p>
+          </div>
+          <span class="pill pill-nile" id="disagreement-pill">—</span>
+        </div>
+        <div class="disagreement-layout">
+          <div class="disagreement-main">
+            <div id="disagreement-summary"></div>
+            <svg id="disagreement-grid" viewBox="0 0 560 420" role="img" aria-label="North-up grid of sensor disagreement by cell across the Nile Delta"></svg>
+            <div class="legend legend-disagree">
+              <span><i class="swatch swatch-aqua"></i>Aqua only</span>
+              <span><i class="swatch swatch-snpp"></i>S-NPP only</span>
+              <span><i class="swatch swatch-both"></i>Both sensors</span>
+              <span><i class="swatch swatch-none"></i>No active cell-day</span>
+            </div>
+          </div>
+          <aside class="disagreement-detail" id="disagreement-detail">
+            <p class="muted">Select a grid cell to inspect its paired counts.</p>
+          </aside>
+        </div>
+        <p class="footnote" id="disagreement-note">Detection disagreement only: the denominator excludes cells where neither sensor detected a hotspot, so this is not a blind-spot estimate.</p>
+      </section>
+
+      <section class="panel audit-panel reveal" id="methodology" aria-labelledby="method-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="method-title">Method, validation &amp; caveats</h2>
+            <p>All numbers below are generated from the local NASA FIRMS archive by <code>firms_pipeline.py</code>.</p>
+          </div>
+          <span class="pill pill-orbit" id="audit-version">—</span>
+        </div>
+
+        <div class="method-grid">
+          <article class="method-card">
+            <h3>What is harmonised here?</h3>
+            <p>Raw monthly hotspot counts are put on the VIIRS S-NPP reference scale with a scalar multiplicative factor fitted on 2013–2022 and tested on 2023–2025. The factor is <em>not</em> a burned-area conversion and does not turn a detection into a confirmed fire incident.</p>
+            <p>A whole-year leave-one-out check (14 folds over 2012–2025) keeps counts as the primary metric: raw MAE drops ~62% (Terra) and ~56% (Aqua), outperforming cell-day scaling in September–October too.</p>
+          </article>
+          <article class="method-card">
+            <h3>Why the caveats are visible</h3>
+            <p>MODIS Collection 6.x versions change over time (6.2 → 6.03 → 61.03), so values before 2013 are labelled <strong>extrapolated</strong>.</p>
+            <p>NOAA-20 did not pass the held-out count test (MAE worsened), so raw values are kept explicitly. When a mixed MODIS/S-NPP baseline flips the anomaly sign, both medians are surfaced.</p>
+          </article>
+          <article class="method-card">
+            <h3>How to read a cell</h3>
+            <dl class="status-list">
+              <dt><i class="dot dot-observed"></i>Observed</dt><dd>S-NPP reference count (factor 1.0).</dd>
+              <dt><i class="dot dot-validated_period"></i>Calibrated</dt><dd>Estimate inside validated 2013–2025 window.</dd>
+              <dt><i class="dot dot-extrapolated"></i>Extrapolated</dt><dd>Pre-2013 estimate; interpret with caution.</dd>
+              <dt><i class="dot dot-raw_only"></i>Raw only</dt><dd>Not harmonised (custom box or failed test).</dd>
+              <dt><i class="dot dot-partial_input"></i>Partial</dt><dd>Archive covers only part of the month.</dd>
+              <dt><i class="dot dot-missing_input"></i>Missing</dt><dd>No local input; no value is invented.</dd>
+            </dl>
+          </article>
+        </div>
+
+        <details open>
+          <summary>Primary calibration (hotspot counts)</summary>
+          <div class="table-wrap" id="audit-calibration"></div>
+          <p class="footnote">Training and test months are separate. Bias is adjusted minus reference. A negative raw bias means MODIS undercounts relative to S-NPP.</p>
+          <h3 class="subhead">Held-out years &amp; September–October peak</h3>
+          <div class="table-wrap" id="audit-by-year"></div>
+        </details>
+
+        <details>
+          <summary>Cell-day sensitivity &amp; spatial validation</summary>
+          <div class="split-tables">
+            <div>
+              <h3>Cell-day metric</h3>
+              <div class="table-wrap" id="audit-sensitivity"></div>
+            </div>
+            <div>
+              <h3>Preset areas</h3>
+              <div class="table-wrap" id="audit-spatial"></div>
+            </div>
+          </div>
+          <p class="footnote">Spatial factors vary strongly across the Delta, which is why custom rectangles remain raw-only.</p>
+        </details>
+
+        <details>
+          <summary>MODIS product-version instability</summary>
+          <div class="table-wrap" id="audit-version"></div>
+          <p class="footnote">Descriptive segment factors across Collection 6.2 → 6.03 → 61.03.</p>
+        </details>
+
+        <details>
+          <summary>Coverage, lineage &amp; archive inventory</summary>
+          <div class="table-wrap" id="audit-coverage"></div>
+          <div class="table-wrap" id="audit-lineage"></div>
+          <p class="footnote" id="audit-totals"></p>
+        </details>
+
+        <details>
+          <summary>Known limitations &amp; challenge alignment</summary>
+          <div class="method-grid">
+            <article class="method-card">
+              <h3>Limitations</h3>
+              <ul id="audit-limitations"></ul>
+            </article>
+            <article class="method-card">
+              <h3>Official references</h3>
+              <ul class="link-list">
+                <li><a href="https://www.spaceappschallenge.org/2026/challenges/modis-and-viirs-hot-spots/" target="_blank" rel="noopener">NASA Space Apps 2026: Harmonization of MODIS &amp; VIIRS Hot Spots</a></li>
+                <li><a href="https://www.spaceappschallenge.org/resources/judging-awards-guide/" target="_blank" rel="noopener">Space Apps judging &amp; awards guide</a></li>
+                <li><a href="https://www.spaceappschallenge.org/resources/project-submission-guide/" target="_blank" rel="noopener">Space Apps project submission guide</a></li>
+                <li><a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">NASA FIRMS</a></li>
+              </ul>
+            </article>
+            <article class="method-card">
+              <h3>Reproduce locally</h3>
+              <pre><code>python pipeline/firms_pipeline.py analyze
+python pipeline/app.py</code></pre>
+              <p>Open <code>http://127.0.0.1:8000</code>. Zero runtime dependencies or internet required.</p>
+            </article>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel downloads-panel reveal" id="downloads" aria-labelledby="downloads-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="downloads-title">Download the evidence</h2>
+            <p id="download-scope">CSV exports include provenance, status and input-completeness columns.</p>
+          </div>
+        </div>
+        <div class="download-grid">
+          <a class="download-card" id="download-monthly" href="#">
+            <div class="download-head">
+              <span class="download-kicker">CSV · selected scale</span>
+              <svg class="download-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <strong>Monthly calendar</strong>
+            <span>2000–2026, one row per month, with raw values for all four platforms.</span>
+          </a>
+          <a class="download-card" id="download-detections" href="#">
+            <div class="download-head">
+              <span class="download-kicker">CSV · raw detections</span>
+              <svg class="download-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <strong>Hotspot point records</strong>
+            <span>Raw FIRMS rows for the selected area and year, including quality and provenance fields.</span>
+          </a>
+          <button type="button" class="download-card" id="download-disagreement">
+            <div class="download-head">
+              <span class="download-kicker">CSV · current month</span>
+              <svg class="download-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <strong>Disagreement grid</strong>
+            <span>Aqua-only, S-NPP-only and both counts for every 0.25° cell in the selected area.</span>
+          </button>
+        </div>
+        <p class="footnote">Canonical processed outputs live in <code>data/processed/</code>. Raw archives are never overwritten with estimates.</p>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>
+          <p><strong>Delta Fire Calendar</strong> · NASA Space Apps Challenge 2026 · Nile Delta Pilot.</p>
+          <p>A FIRMS hotspot is a satellite detection, not a confirmed fire incident. Historical comparison tool only.</p>
+        </div>
+        <div class="footer-keys" aria-label="Keyboard shortcuts">
+          <span><kbd>←</kbd><kbd>→</kbd> Step</span>
+          <span><kbd>Space</kbd> Play</span>
+          <span><kbd>R</kbd> Demo</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="floating-tip" id="floating-tip" role="tooltip" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">This app needs JavaScript to render the calendar and maps.</p></noscript>
+  <script src="/app.js" defer></script>
+</body>
+</html>

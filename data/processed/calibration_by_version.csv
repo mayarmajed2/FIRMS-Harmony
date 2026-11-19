@@ -1,0 +1,7 @@
+﻿source,version,first_month,last_month,overlap_months,factor,mae_raw,mae_adjusted,bias_raw,bias_adjusted,note
+terra,6.03,2018-01,2022-12,60,22.758065,292.28,109.94,-292.28,-0.0,descriptive_version_segment
+terra,6.2,2012-02,2017-12,71,16.728597,486.48,150.91,-486.48,-0.0,descriptive_version_segment
+terra,61.03,2023-01,2025-12,36,19.431405,309.75,147.85,-309.75,-0.0,descriptive_version_segment
+aqua,6.03,2018-01,2022-12,60,26.622642,294.23,156.85,-294.23,-0.0,descriptive_version_segment
+aqua,6.2,2012-02,2017-12,71,16.414656,485.89,169.46,-485.89,0.0,descriptive_version_segment
+aqua,61.03,2023-01,2025-12,35,18.085404,314.37,129.02,-314.37,0.0,descriptive_version_segment

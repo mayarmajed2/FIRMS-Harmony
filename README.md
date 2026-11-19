@@ -185,7 +185,11 @@ FIRMS-Harmony/
 │   └── processed/              # Real NASA FIRMS Egypt (2000–2025) validated CSV outputs
 ├── pipeline/
 │   ├── firms_pipeline.py       # Python ETL, spatial clipping & out-of-sample calibration pipeline
-│   └── app.py                  # Python API/dashboard server for local pipeline exploration
+│   └── app.py                  # Dependency-free Python API & server for Delta Fire Calendar (port 8000)
+├── web/                        # Delta Fire Calendar interactive NASA × Fire × Nile Delta UI
+│   ├── index.html              # Mission dashboard shell & animated orbital emblem
+│   ├── styles.css              # NASA deep space × thermal fire × Nile emerald responsive design
+│   └── app.js                  # North-up Nile Delta map, Terra/Aqua/S-NPP/NOAA-20 controls, time-lapse & audit
 ├── js/
 │   ├── utils.js                # Shared DOM, HTML-escaping & CSV-sanitization helpers
 │   ├── i18n.js                 # EN/AR dictionary, RTL switcher & langchange event
@@ -224,8 +228,8 @@ cd FIRMS-Harmony
 ```
 Open `index.html` directly in any modern browser (Chrome, Edge, Firefox, or Safari).
 
-### Option 2: Run with a Local Static Server (Recommended)
-Serving over HTTP avoids browser restrictions on local file origins and matches production deployment:
+### Option 2: Run the Static SPA Locally (Recommended for `index.html`)
+Serving over HTTP avoids browser restrictions on local file origins and matches GitHub Pages deployment:
 
 ```bash
 # Using Python 3
@@ -235,6 +239,19 @@ python -m http.server 8080
 npx serve . -l 8080
 ```
 Then open `http://localhost:8080` in your browser.
+
+### Option 3: Launch the Interactive Delta Fire Calendar Server (`pipeline/app.py` + `web/`)
+Run the dependency-free Python 3.10+ backend over the full verified 2000–2025 NASA FIRMS Nile Delta archive (`data/processed/`):
+
+```bash
+python pipeline/app.py
+```
+Then open `http://127.0.0.1:8000` (or jump straight to the verified September 2023 demo view: `http://127.0.0.1:8000/?area=full&year=2023&month=9&scale=harmonized&platform=snpp`).
+
+**Highlights of the Delta Fire Calendar (`web/`):**
+- **True North-Up Nile Delta Spatial Grid (`0.25°`)** with animated Nile River, Rosetta & Damietta branches, Mediterranean coastline, orbital satellite sweep track, city landmarks, and drag-to-select custom rectangles.
+- **Interactive Satellite Isolation (`Terra`, `Aqua`, `S-NPP`, `NOAA-20`)** alongside Harmonised and S-NPP Reference Era scales, plus one-click verified judge scenarios and **Time-Lapse playback** (`Yearly` / `Monthly`, `1×` / `2×`, keyboard shortcuts `←` `→` `Space` `R`).
+- **Aqua vs. S-NPP Detection Disagreement Grid**, full 27-year (`2000–2026`) monthly calendar matrix, out-of-sample MAE/bias validation tables, and CSV evidence downloads.
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for browser compatibility, network requirements, and verification steps.
 

@@ -43,3 +43,10 @@ pnpm-debug.log*
 *.temp
 *.zip
 *.tar.gz
+
+# Python bytecode & local raw archives
+__pycache__/
+*.py[cod]
+*$py.class
+data/raw/
+.delta-library-helpers-*
