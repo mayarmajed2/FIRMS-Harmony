@@ -100,6 +100,20 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
 
     els.forEach(el => io.observe(el));
+
+    const checkVisible = () => {
+      const vh = window.innerHeight || 800;
+      els.forEach(el => {
+        if (el.classList.contains('in')) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.height > 0 && rect.top < vh * 0.95) {
+          el.classList.add('in');
+          io.unobserve(el);
+        }
+      });
+    };
+    window.addEventListener('hashchange', () => requestAnimationFrame(checkVisible));
+    requestAnimationFrame(checkVisible);
   }
 
   if (document.readyState === 'loading') {

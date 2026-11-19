@@ -20,7 +20,7 @@ function route() {
     if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
   updateTitle();
-  scrollTo(0, 0);
+  scrollTo({ top: 0, behavior: 'instant' });
   if (id === 'home') count();
   if (id === 'map') { initMap(); if (map) map.invalidateSize(); }
 }

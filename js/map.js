@@ -400,6 +400,9 @@ function initFilters() {
         if (tlPlaying) tlStop();
         render();
       });
+      if (el.tagName === 'SELECT') {
+        el.addEventListener('change', () => el.blur());
+      }
     }
   });
 }
