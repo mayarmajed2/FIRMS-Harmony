@@ -1794,6 +1794,9 @@ function renderChips(compare) {
 function renderCalendar() {
   const calendar = state.data.calendar;
   const table = $('#calendar-table');
+  const scroll = $('.calendar-scroll');
+  const prevScrollTop = scroll ? scroll.scrollTop : 0;
+  const prevScrollLeft = scroll ? scroll.scrollLeft : 0;
   table.replaceChildren();
   const maxValue = Math.max(1, calendar.max_value || 0);
   const byMonth = new Map();
@@ -1913,11 +1916,14 @@ function renderCalendar() {
   const custom = state.areaId === 'custom' ? 'Custom rectangle · raw counts only. ' : '';
   note.textContent = `${custom}${fmtInt(shown)} months with a value · ${fmtInt(extrapolated)} extrapolated · ${fmtInt(partial)} partial · ${fmtInt(missing)} missing or outside platform period · peak ${fmtInt(calendar.max_value)}.`;
 
-  const scroll = $('.calendar-scroll');
-  if (selectedButton && scroll && !state.playing) {
-    const offset = selectedButton.getBoundingClientRect().top - scroll.getBoundingClientRect().top;
-    if (offset < 0 || offset > scroll.clientHeight - 30) {
-      scroll.scrollTop += offset - scroll.clientHeight / 2;
+  if (scroll) {
+    scroll.scrollTop = prevScrollTop;
+    scroll.scrollLeft = prevScrollLeft;
+    if (selectedButton && !state.playing && scroll.scrollHeight > scroll.clientHeight + 2) {
+      const offset = selectedButton.getBoundingClientRect().top - scroll.getBoundingClientRect().top;
+      if (offset < 38 || offset > scroll.clientHeight - 30) {
+        scroll.scrollTop += offset - scroll.clientHeight / 2;
+      }
     }
   }
 }

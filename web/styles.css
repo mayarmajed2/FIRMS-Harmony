@@ -221,6 +221,13 @@ h3 { font-size: 0.95rem; margin-bottom: 8px; color: #eef4fc; }
 }
 .kicker-sep { color: var(--faint); }
 .kicker-nile { color: var(--nile); }
+.brand-desc {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.44;
+  color: var(--muted);
+  max-width: 680px;
+}
 
 .top-actions {
   display: flex;
@@ -1098,7 +1105,7 @@ main > * { min-width: 0; }
   padding: 8px;
 }
 .calendar th {
-  position: sticky; top: 0; z-index: 3;
+  position: sticky; top: 0; z-index: 6;
   background: #0b1629; color: var(--muted);
   font-size: 0.7rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.07em;
   padding: 7px 3px; border-radius: 6px;
@@ -1110,12 +1117,12 @@ main > * { min-width: 0; }
 }
 .calendar th button:hover { color: #ffffff; }
 .calendar th.year-head {
-  position: sticky; left: 0; z-index: 4; background: #0b1629;
+  position: sticky; left: 0; z-index: 7; background: #0b1629;
   text-align: left; padding-left: 10px; min-width: 82px;
 }
 .calendar td { padding: 0; }
 .calendar tr.era-break td { padding-top: 5px; }
-.calendar td.year-cell { position: sticky; left: 0; z-index: 2; background: #0b1629; border-radius: 6px; }
+.calendar td.year-cell { position: sticky; left: 0; z-index: 4; background: #0b1629; border-radius: 6px; }
 .calendar td.year-cell.is-current { background: rgba(255, 107, 26, 0.2); }
 .calendar td.year-cell button {
   all: unset; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
@@ -1145,7 +1152,7 @@ main > * { min-width: 0; }
 }
 .cal-cell.selected {
   box-shadow: inset 0 0 0 2px #ffffff, 0 0 0 2px var(--fire), 0 0 16px rgba(255, 107, 26, 0.65);
-  z-index: 3;
+  z-index: 2;
 }
 .cal-cell.missing, .cal-cell.outside { color: #5c718c; background: rgba(100, 116, 139, 0.08); }
 .cal-cell.missing {
