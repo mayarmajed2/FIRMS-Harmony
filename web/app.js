@@ -531,8 +531,13 @@ function effectiveScale() {
   return state.areaId === 'custom' ? 'raw' : state.scale;
 }
 
+let STATIC_MODE = false;
+
 async function api(path, extra = {}) {
   const params = baseParams(extra);
+  if (STATIC_MODE && window.StaticDeltaApi) {
+    return window.StaticDeltaApi.query(path, params);
+  }
   const response = await fetch(`${path}?${params.toString()}`, { cache: 'no-store' });
   if (!response.ok) {
     let detail = response.statusText;
@@ -915,9 +920,37 @@ function bindControls() {
     }
   });
 
-  for (const id of ['#download-monthly', '#download-detections']) {
-    $(id).addEventListener('click', () => toast('Preparing CSV export. Large detection exports can take a few seconds.'));
-  }
+  $('#download-monthly').addEventListener('click', event => {
+    if (STATIC_MODE && window.StaticDeltaApi) {
+      event.preventDefault();
+      const params = baseParams({
+        kind: 'monthly', scale: effectiveScale(), platform: state.platform, start_year: 2000, end_year: 2026,
+      });
+      const { filename, text } = window.StaticDeltaApi.monthlyCsv(params);
+      triggerBlobDownload(filename, text);
+      toast('Monthly calendar CSV exported.');
+      return;
+    }
+    toast('Preparing CSV export. Large detection exports can take a few seconds.');
+  });
+
+  $('#download-detections').addEventListener('click', async event => {
+    if (STATIC_MODE && window.StaticDeltaApi) {
+      event.preventDefault();
+      toast('Downloading & filtering raw detections archive… please wait a moment.');
+      try {
+        const params = baseParams({ kind: 'detections', start_year: state.year, end_year: state.year });
+        const { filename, text } = await window.StaticDeltaApi.detectionsCsv(params);
+        triggerBlobDownload(filename, text);
+        toast(`Exported ${filename}.`);
+      } catch (err) {
+        console.error(err);
+        toast(`Could not export raw detections: ${err.message}`);
+      }
+      return;
+    }
+    toast('Preparing CSV export. Large detection exports can take a few seconds.');
+  });
   $('#download-disagreement').addEventListener('click', downloadDisagreement);
 }
 
@@ -2164,6 +2197,18 @@ function csvEscape(value) {
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
+function triggerBlobDownload(filename, text) {
+  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 function downloadDisagreement() {
   const data = state.data.disagreement;
   if (!data) {
@@ -2180,15 +2225,7 @@ function downloadDisagreement() {
       'NASA FIRMS annual Egypt archive; paired Aqua vs S-NPP cell-days']);
   }
   const text = '\ufeff' + rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
-  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = `delta_disagreement_${state.areaId}_${monthKey()}.csv`;
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
+  triggerBlobDownload(`delta_disagreement_${state.areaId}_${monthKey()}.csv`, text);
   toast('Disagreement grid exported.');
 }
 
@@ -2293,15 +2330,42 @@ function renderAudit() {
 
 /* --------------------------------------------------------------------- init */
 
+async function loadMetaWithFallback() {
+  const host = window.location.hostname;
+  const preferStatic = Boolean(window.StaticDeltaApi) && (
+    host.endsWith('github.io') ||
+    host.endsWith('netlify.app') ||
+    host.endsWith('vercel.app') ||
+    host.endsWith('pages.dev') ||
+    window.location.protocol === 'file:'
+  );
+  if (preferStatic) {
+    STATIC_MODE = true;
+    await window.StaticDeltaApi.init('../data/processed');
+    return window.StaticDeltaApi.query('/api/meta', new URLSearchParams());
+  }
+  try {
+    const response = await fetch('/api/meta', { cache: 'no-store' });
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok || !contentType.includes('application/json')) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  } catch (apiError) {
+    if (!window.StaticDeltaApi) throw apiError;
+    STATIC_MODE = true;
+    await window.StaticDeltaApi.init('../data/processed');
+    return window.StaticDeltaApi.query('/api/meta', new URLSearchParams());
+  }
+}
+
 async function init() {
   initCosmosCanvas();
   initSpotlights();
   initRevealObserver();
 
   try {
-    const response = await fetch('/api/meta', { cache: 'no-store' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    state.meta = await response.json();
+    state.meta = await loadMetaWithFallback();
     FULL = { ...state.meta.bounds };
     GX = state.meta.grid.x.map(Number);
     GY = state.meta.grid.y.map(Number);
@@ -2316,8 +2380,8 @@ async function init() {
     await refresh();
   } catch (error) {
     console.error(error);
-    $('#scope-note').textContent = `The local API could not be loaded: ${error.message}. Start the app with "python pipeline/app.py" and reload.`;
-    toast('Could not load /api/meta. Is the Python server running?');
+    $('#scope-note').textContent = `Could not load the verified archive: ${error.message}. Start the app with "python pipeline/app.py" and reload.`;
+    toast('Could not load archive data. Is the server running?');
   }
 }
 

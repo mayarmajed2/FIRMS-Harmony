@@ -7,7 +7,7 @@
   <meta name="description" content="Delta Fire Calendar: a reproducible MODIS and VIIRS hotspot calendar and harmonisation audit for the Nile Delta.">
   <title>Delta Fire Calendar | NASA FIRMS harmonisation</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050a14'/%3E%3Cellipse cx='32' cy='32' rx='26' ry='12' transform='rotate(-26 32 32)' fill='none' stroke='%2338bdf8' stroke-width='2.2' opacity='.75'/%3E%3Cpath d='M32 9c6 10-5 14 0 23 4-5 6-8 6-12 7 6 10 13 10 20a16 16 0 0 1-32 0c0-6 4-11 8-16 0 6 3 9 6 11-4-9 1-18 2-26Z' fill='%23f97316'/%3E%3Cpath d='M16 47c5-3 11-3 16 0s11 3 16 0' fill='none' stroke='%232dd4bf' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <canvas id="cosmos-canvas" class="cosmos-canvas" aria-hidden="true"></canvas>
@@ -459,6 +459,7 @@ python pipeline/app.py</code></pre>
   <div class="floating-tip" id="floating-tip" role="tooltip" hidden></div>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <noscript><p class="noscript">This app needs JavaScript to render the calendar and maps.</p></noscript>
-  <script src="/app.js" defer></script>
+  <script src="./static-api.js" defer></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>

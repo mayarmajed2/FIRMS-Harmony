@@ -4,21 +4,21 @@
 
 <br><br>
 
+[![Live Demo — Delta Fire Calendar](https://img.shields.io/badge/🚀%20LIVE%20DEMO-Delta%20Fire%20Calendar-ff6b1a?style=for-the-badge)](https://mayarmajed2.github.io/FIRMS-Harmony/web/)
+[![Live Demo — Bilingual SPA](https://img.shields.io/badge/🌍%20LIVE%20SPA-EN%20%7C%20AR%20RTL-14b8a6?style=for-the-badge)](https://mayarmajed2.github.io/FIRMS-Harmony/)
 [![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps%202026-MODIS%20%26%20VIIRS%20Hot%20Spots-0b3d91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/2026/challenges/modis-and-viirs-hot-spots/)
-[![Verified Archive](https://img.shields.io/badge/NASA%20FIRMS-2000--2025%20(48%20Files)-ff6b1a?style=for-the-badge)](data/processed/coverage_summary.csv)
-[![Held-Out MAE](https://img.shields.io/badge/Held--Out%20MAE-%E2%88%9254.5%25%20Improved-14b8a6?style=for-the-badge)](data/processed/calibration_baseline.csv)
-[![Zero Dependencies](https://img.shields.io/badge/Runtime-Zero%20Dependencies-38bdf8?style=for-the-badge)](#quick-start)
-[![Bilingual SPA](https://img.shields.io/badge/Web%20SPA-EN%20%7C%20AR%20RTL-0d9488?style=for-the-badge)](docs/USER_GUIDE.md)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-Browser%20Suite-c084fc?style=for-the-badge)](tests/index.html)
+[![Verified Archive](https://img.shields.io/badge/NASA%20FIRMS-2000--2025%20(48%20Files)-f59e0b?style=for-the-badge)](data/processed/coverage_summary.csv)
+[![Held-Out MAE](https://img.shields.io/badge/Held--Out%20MAE-%E2%88%9254.5%25%20Improved-38bdf8?style=for-the-badge)](data/processed/calibration_baseline.csv)
+[![Zero Dependencies](https://img.shields.io/badge/Runtime-Zero%20Dependencies-c084fc?style=for-the-badge)](#quick-start)
 
 <h3>
   <em>Turning 25 years of fragmented NASA MODIS &amp; VIIRS detections into one honest, comparable Nile Delta fire calendar.</em>
 </h3>
 
 <p>
-  <a href="#-live-mission-dashboard"><strong>✨ Live Preview</strong></a> &nbsp;·&nbsp;
-  <a href="#quick-start"><strong>⚡ 60s Launch</strong></a> &nbsp;·&nbsp;
-  <a href="#-why-firms-harmony"><strong>🔥 Why It Matters</strong></a> &nbsp;·&nbsp;
+  <a href="https://mayarmajed2.github.io/FIRMS-Harmony/web/"><strong>🚀 Open Live Delta Calendar</strong></a> &nbsp;·&nbsp;
+  <a href="https://mayarmajed2.github.io/FIRMS-Harmony/"><strong>🌍 Open Live EN/AR SPA</strong></a> &nbsp;·&nbsp;
+  <a href="#quick-start"><strong>⚡ 60s Local Run</strong></a> &nbsp;·&nbsp;
   <a href="#-interactive-explorers"><strong>🛰️ Interactive Explorers</strong></a> &nbsp;·&nbsp;
   <a href="#-documentation"><strong>📚 Docs</strong></a>
 </p>
