@@ -3,6 +3,7 @@
 const I18N = {
   en: {
     // Navigation
+    hdr_sub: 'MODIS & VIIRS Satellite Fire Harmonization · Nile Valley & Delta',
     nav_home: 'Home',
     nav_map: 'Fire Map',
     nav_analytics: 'Analytics',
@@ -170,6 +171,7 @@ const I18N = {
 
   ar: {
     // Navigation
+    hdr_sub: 'تنسيق رصدات الحرائق الفضائية MODIS وVIIRS · وادي النيل والدلتا',
     nav_home: 'الرئيسية',
     nav_map: 'خريطة الحرائق',
     nav_analytics: 'التحليلات والاتجاهات',

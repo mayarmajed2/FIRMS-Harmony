@@ -141,6 +141,13 @@ header {
   box-shadow: 0 0 18px rgba(0, 217, 255, .28);
 }
 
+.logo-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.15;
+}
+
 .logo-word {
   font-weight: 400;
   color: #cfe4ff;
@@ -149,6 +156,15 @@ header {
 .logo-word b {
   font-weight: 700;
   color: var(--white);
+}
+
+.logo-sub {
+  font-family: var(--fb);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--smoke);
+  max-width: 340px;
 }
 
 nav {
