@@ -376,6 +376,8 @@ function parseFIRMSCSV(csvText) {
   const lonIdx = headers.findIndex(h => h === 'longitude' || h === 'lon');
   const frpIdx = headers.findIndex(h => h === 'frp');
   const dateIdx = headers.findIndex(h => h === 'acq_date' || h === 'date');
+  const timeIdx = headers.findIndex(h => h === 'acq_time' || h === 'time');
+  const confIdx = headers.findIndex(h => h === 'confidence' || h === 'conf');
   const instIdx = headers.findIndex(h => h === 'instrument' || h === 'sensor');
   const satIdx = headers.findIndex(h => h === 'satellite');
   const verIdx = headers.findIndex(h => h === 'version');
@@ -443,18 +445,175 @@ function parseFIRMSCSV(csvText) {
       sensor = 'VIIRS';
     }
 
+    const rawTime = timeIdx !== -1 ? (row[timeIdx] || '').trim() : '';
+    const acqTime = /^\d{1,4}$/.test(rawTime) ? rawTime.padStart(4, '0') : null;
+    const rawConf = confIdx !== -1 ? (row[confIdx] || '').trim() : '';
+    const confidence = normalizeConfidence(rawConf, sensor);
+
     parsed.push({
       id: parsed.length,
       sensor,
+      satellite: satVal || sensor,
       lat: +lat.toFixed(4),
       lon: +lon.toFixed(4),
       year,
       date: dateStr,
+      acqTime,
+      confidence,
+      confidenceRaw: rawConf || null,
       frp: +frp.toFixed(1)
     });
   }
 
   return { parsed, skippedOutside, skippedInvalid };
+}
+
+/**
+ * Normalize MODIS numeric confidence (0–100%, Giglio et al. 2016) and
+ * VIIRS categorical confidence (l/n/h, Schroeder et al. 2014) onto a
+ * unified ordinal scale without discarding original provenance.
+ */
+function normalizeConfidence(rawConf, sensor) {
+  if (rawConf === null || rawConf === undefined || rawConf === '') return 'unknown';
+  const s = String(rawConf).trim().toLowerCase();
+  if (s === 'l' || s === 'low') return 'low';
+  if (s === 'n' || s === 'nominal' || s === 'medium') return 'nominal';
+  if (s === 'h' || s === 'high') return 'high';
+  const num = Number(s);
+  if (Number.isFinite(num) && num >= 0 && num <= 100) {
+    if (num < 30) return 'low';
+    if (num < 80) return 'nominal';
+    return 'high';
+  }
+  return 'unknown';
+}
+
+/**
+ * Great-circle Haversine distance in kilometers (WGS84 mean radius).
+ */
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371.0088;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function acqTimeToMinutes(hhmm) {
+  if (!hhmm || !/^\d{4}$/.test(hhmm)) return null;
+  const h = parseInt(hhmm.slice(0, 2), 10);
+  const m = parseInt(hhmm.slice(2, 4), 10);
+  if (h > 23 || m > 59) return null;
+  return h * 60 + m;
+}
+
+/**
+ * Non-destructive cross-sensor spatiotemporal correspondence & uncertainty engine.
+ * Classifies overlap-era detections into:
+ *  - Corroborated (MODIS & VIIRS agree within maxDistKm and temporal window)
+ *  - VIIRS-only (small/sub-pixel fires below MODIS threshold or overpass mismatch)
+ *  - MODIS-only (overpass timing/cloud difference or single-sensor anomaly)
+ * Also flags same-sensor near-duplicates (< 0.5 km, same UTC date) and
+ * summarizes unified confidence tiers.
+ */
+function computeCrossSensorMatching(dataset = DATA, opts = {}) {
+  const maxDistKm = typeof opts.maxDistKm === 'number' ? opts.maxDistKm : 1.5;
+  const maxMinutes = typeof opts.maxMinutes === 'number' ? opts.maxMinutes : 360;
+  const dupDistKm = typeof opts.dupDistKm === 'number' ? opts.dupDistKm : 0.5;
+
+  const byDate = new Map();
+  const confidenceBreakdown = { high: 0, nominal: 0, low: 0, unknown: 0 };
+
+  for (let i = 0; i < dataset.length; i++) {
+    const d = dataset[i];
+    const tier = d.confidence || 'unknown';
+    confidenceBreakdown[tier] = (confidenceBreakdown[tier] || 0) + 1;
+    if (!byDate.has(d.date)) byDate.set(d.date, []);
+    byDate.get(d.date).push(d);
+  }
+
+  let matchedModis = 0;
+  let matchedViirs = 0;
+  let modisOnly = 0;
+  let viirsOnly = 0;
+  let duplicateCount = 0;
+  let totalMatchDist = 0;
+  let matchDistSamples = 0;
+
+  byDate.forEach(dayRecords => {
+    const modis = [];
+    const viirs = [];
+    for (let i = 0; i < dayRecords.length; i++) {
+      if (dayRecords[i].sensor === 'MODIS') modis.push(dayRecords[i]);
+      else if (dayRecords[i].sensor === 'VIIRS') viirs.push(dayRecords[i]);
+    }
+
+    // Same-sensor near-duplicate detection (< dupDistKm on same date)
+    [modis, viirs].forEach(group => {
+      for (let i = 0; i < group.length; i++) {
+        for (let j = i + 1; j < group.length; j++) {
+          if (haversineKm(group[i].lat, group[i].lon, group[j].lat, group[j].lon) < dupDistKm) {
+            duplicateCount++;
+            break;
+          }
+        }
+      }
+    });
+
+    if (!modis.length && !viirs.length) return;
+    if (!viirs.length) { modisOnly += modis.length; return; }
+    if (!modis.length) { viirsOnly += viirs.length; return; }
+
+    const viirsMatchedSet = new Set();
+    for (let i = 0; i < modis.length; i++) {
+      const m = modis[i];
+      const mMin = acqTimeToMinutes(m.acqTime);
+      let bestDist = Infinity;
+      let found = false;
+
+      for (let j = 0; j < viirs.length; j++) {
+        const v = viirs[j];
+        const vMin = acqTimeToMinutes(v.acqTime);
+        if (mMin !== null && vMin !== null && Math.abs(mMin - vMin) > maxMinutes) continue;
+        const dist = haversineKm(m.lat, m.lon, v.lat, v.lon);
+        if (dist <= maxDistKm) {
+          found = true;
+          viirsMatchedSet.add(j);
+          if (dist < bestDist) bestDist = dist;
+        }
+      }
+
+      if (found) {
+        matchedModis++;
+        totalMatchDist += bestDist;
+        matchDistSamples++;
+      } else {
+        modisOnly++;
+      }
+    }
+
+    matchedViirs += viirsMatchedSet.size;
+    viirsOnly += (viirs.length - viirsMatchedSet.size);
+  });
+
+  const totalModis = matchedModis + modisOnly;
+  const totalViirs = matchedViirs + viirsOnly;
+
+  return {
+    maxDistKm,
+    maxMinutes,
+    matchedModis,
+    matchedViirs,
+    modisOnly,
+    viirsOnly,
+    modisCorroborationRate: totalModis > 0 ? +((matchedModis / totalModis) * 100).toFixed(1) : null,
+    viirsCorroborationRate: totalViirs > 0 ? +((matchedViirs / totalViirs) * 100).toFixed(1) : null,
+    meanMatchDistKm: matchDistSamples > 0 ? +(totalMatchDist / matchDistSamples).toFixed(2) : null,
+    duplicateCount,
+    confidenceBreakdown
+  };
 }
 
 /**

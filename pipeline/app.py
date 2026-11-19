@@ -21,7 +21,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 PROC = ROOT / 'data' / 'processed'
 WEB = ROOT / 'web'
 BOUNDS = (29.5, 29.8, 32.5, 31.65)

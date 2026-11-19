@@ -8,7 +8,7 @@
   [![JavaScript ES6+](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
   [![Leaflet 1.9.4](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
   [![Bilingual](https://img.shields.io/badge/i18n-EN%20%7C%20AR%20RTL-1f7a78?style=for-the-badge)](docs/USER_GUIDE.md#language-and-rtl-support)
-  [![Tests](https://img.shields.io/badge/Tests-21%20Passing-3cc9b6?style=for-the-badge)](tests/index.html)
+  [![Tests](https://img.shields.io/badge/Tests-25%20Passing-3cc9b6?style=for-the-badge)](tests/index.html)
   [![Verified Archive](https://img.shields.io/badge/NASA%20FIRMS-2000--2025%20(74%20Files)-f08a3c?style=for-the-badge)](data/processed/coverage_summary.csv)
   [![Zero Build](https://img.shields.io/badge/Build-Zero%20Dependencies-ff5a4a?style=for-the-badge)](docs/INSTALLATION.md)
 
@@ -63,6 +63,7 @@ Long-term wildfire and agricultural burning studies routinely span more than two
   - Three zero-dependency inline SVG visualizations: **Yearly Stacked Activity** (with explicit 2012 transition marker), **Monthly Seasonality** (highlighting the Oct–Dec rice-straw peak), and **FRP Distribution Histogram** (with median reference line).
   - **Nile Delta Agricultural Burning Calendar** aligning fire cycles with Egyptian crop phenology (autumn rice straw, spring wheat stubble, summer growing minimum).
   - **Empirical Cross-Sensor Harmonization Matrix** computing overlap count ratio ($R_{\text{count}}$), MODIS/VIIRS mean FRP, and mean intensity ratio ($\alpha$) across `2012–2024`.
+  - **Spatiotemporal Correspondence & Confidence Normalization Engine:** Non-destructively classifies detections into **Corroborated Agreement** (`MODIS ↔ VIIRS` within `≤ 1.5 km` Haversine distance and `≤ 6 h` UTC overpass tolerance), **VIIRS-Only** (sub-pixel), and **MODIS-Only** (overpass/cloud disagreement), flags same-sensor near-duplicates (`< 0.5 km`), and normalizes MODIS numeric confidence (`0–100%`) alongside VIIRS categorical confidence (`l`/`n`/`h`).
 
 - **📂 Client-Side NASA FIRMS CSV Ingestion**
   - Upload standard NASA FIRMS CSV exports (`MOD14`/`MYD14` MODIS or `VNP14IMGTDL`/`VJ114IMGTDL` VIIRS) directly from the Analytics view.

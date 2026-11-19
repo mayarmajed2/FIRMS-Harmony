@@ -627,6 +627,7 @@
             ${t('an_calib_desc', 'Calculated over the 2012–2024 co-observation baseline along the Nile corridor polygon:')}
           </p>
           <div id="an-calib-box" class="an-chart" style="padding:22px;margin-bottom:24px;"></div>
+          <div id="an-match-box" class="an-chart" style="padding:22px;margin-bottom:24px;"></div>
 
           <h3 style="font-size:20px;color:var(--white);margin:24px 0 10px;">${t('an_upload_title', 'Load Live NASA FIRMS Data (CSV)')}</h3>
           <p style="color:var(--smoke);font-size:13px;margin:0 0 16px;line-height:1.6;">
@@ -759,6 +760,48 @@
           </div>
         </div>
         ${missingSensorNote}
+      `;
+    }
+
+    // Render Cross-Sensor Spatiotemporal Matching & Confidence Normalization Panel
+    const matchBox = document.getElementById('an-match-box');
+    if (matchBox && typeof computeCrossSensorMatching === 'function') {
+      const m = computeCrossSensorMatching();
+      const corrTotal = m.matchedModis + m.matchedViirs;
+      const distText = m.meanMatchDistKm !== null ? `${m.meanMatchDistKm} km` : '—';
+      const cb = m.confidenceBreakdown;
+      const hasConf = (cb.high + cb.nominal + cb.low) > 0;
+      const confLine = hasConf
+        ? `${isAr ? 'توزيع الثقة الموحّد:' : 'Unified Confidence:'} <b style="color:#3cc9b6">${isAr ? 'عالية' : 'High'} ${fmt(cb.high)}</b> · <b style="color:var(--white)">${isAr ? 'متوسطة' : 'Nominal'} ${fmt(cb.nominal)}</b> · <b style="color:var(--ember)">${isAr ? 'منخفضة' : 'Low'} ${fmt(cb.low)}</b>`
+        : (isAr ? 'توزيع الثقة الموحّد: يُحسب تلقائياً عند رفع ملف NASA FIRMS CSV يحتوي عمود confidence.' : 'Unified Confidence (MODIS % ↔ VIIRS l/n/h): populates automatically when a NASA FIRMS CSV with a confidence column is uploaded.');
+
+      matchBox.innerHTML = `
+        <h3 style="margin:0 0 12px;font-size:17px;color:var(--white);">
+          ${isAr ? 'التطابق المكاني-الزمني وعدم اليقين بين المستشعرين (≤ 1.5 كم، نفس اليوم / ≤ 6 ساعات)' : 'Cross-Sensor Spatiotemporal Agreement & Uncertainty (≤ 1.5 km, Same Day / ≤ 6 h)'}
+        </h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
+          <div style="background:rgba(60,201,182,.08);border:1px solid rgba(60,201,182,.25);padding:13px;border-radius:8px;">
+            <span style="font-size:11.5px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'توافق مؤكد (MODIS ↔ VIIRS)' : 'Corroborated Agreement'}</span>
+            <b style="font-size:22px;color:#3cc9b6;font-family:var(--fd);">${fmt(corrTotal)}</b>
+            <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">MODIS ${fmt(m.matchedModis)} · VIIRS ${fmt(m.matchedViirs)}</span>
+          </div>
+          <div style="background:rgba(224,67,43,.08);border:1px solid rgba(224,67,43,.25);padding:13px;border-radius:8px;">
+            <span style="font-size:11.5px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'رصد VIIRS فقط (حرائق دقيقة)' : 'VIIRS-Only (Sub-Pixel)'}</span>
+            <b style="font-size:22px;color:#e0432b;font-family:var(--fd);">${fmt(m.viirsOnly)}</b>
+            <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${isAr ? 'دون عتبة 1 كم لـ MODIS' : 'Unmatched by 1 km MODIS'}</span>
+          </div>
+          <div style="background:rgba(240,138,60,.08);border:1px solid rgba(240,138,60,.25);padding:13px;border-radius:8px;">
+            <span style="font-size:11.5px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'رصد MODIS فقط (تباين مرور)' : 'MODIS-Only (Disagreement)'}</span>
+            <b style="font-size:22px;color:#f08a3c;font-family:var(--fd);">${fmt(m.modisOnly)}</b>
+            <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${isAr ? 'فرق توقيت أو غيوم' : 'Overpass / cloud variance'}</span>
+          </div>
+          <div style="background:rgba(255,255,255,.03);padding:13px;border-radius:8px;">
+            <span style="font-size:11.5px;color:var(--smoke);display:block;margin-bottom:4px;">${isAr ? 'متوسط مسافة التطابق / التكرارات' : 'Mean Offset / Near-Dups'}</span>
+            <b style="font-size:22px;color:var(--white);font-family:var(--fd);">${distText}</b>
+            <span style="font-size:11px;color:var(--smoke);display:block;margin-top:2px;">${fmt(m.duplicateCount)} ${isAr ? 'تكرار قريب (<0.5 كم)' : 'same-sensor <0.5 km'}</span>
+          </div>
+        </div>
+        <p style="margin:12px 0 0;font-size:12px;color:var(--smoke);line-height:1.5;">${confLine}</p>
       `;
     }
 

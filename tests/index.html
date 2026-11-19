@@ -293,6 +293,62 @@
     assert($('an-verified-chart') && $('an-verified-chart').querySelector('svg'), 'Verified harmonized SVG chart should render');
   });
 
+  /* ── 11. Phase 5 Scientific Cross-Sensor Matching & Confidence Normalization ── */
+  test('normalizeConfidence unifies MODIS (0–100%) and VIIRS (l/n/h) without fabricating unknowns', () => {
+    assertEqual(normalizeConfidence('15', 'MODIS'), 'low');
+    assertEqual(normalizeConfidence('65', 'MODIS'), 'nominal');
+    assertEqual(normalizeConfidence('92', 'MODIS'), 'high');
+    assertEqual(normalizeConfidence('l', 'VIIRS'), 'low');
+    assertEqual(normalizeConfidence('n', 'VIIRS'), 'nominal');
+    assertEqual(normalizeConfidence('h', 'VIIRS'), 'high');
+    assertEqual(normalizeConfidence('', 'VIIRS'), 'unknown');
+  });
+
+  test('haversineKm computes accurate geodesic distances', () => {
+    const d0 = haversineKm(31.05, 31.38, 31.05, 31.38);
+    assertEqual(d0, 0, 'Zero distance for identical coordinates');
+    const d1 = haversineKm(31.00, 31.00, 31.01, 31.00);
+    assert(d1 > 1.05 && d1 < 1.15, '0.01 deg lat should be ~1.11 km, got ' + d1);
+  });
+
+  test('computeCrossSensorMatching separates matched agreement, VIIRS-only, MODIS-only, temporal mismatch & near-duplicates', () => {
+    const sample = [
+      // Pair A: MODIS & VIIRS within ~0.55 km and 20 min -> MATCHED
+      { id: 0, sensor: 'MODIS', lat: 31.0500, lon: 31.3800, year: 2024, date: '2024-10-15', acqTime: '1100', confidence: 'high', frp: 15.0 },
+      { id: 1, sensor: 'VIIRS', lat: 31.0540, lon: 31.3830, year: 2024, date: '2024-10-15', acqTime: '1120', confidence: 'nominal', frp: 6.2 },
+      // Near-duplicate of VIIRS #1 (< 0.2 km, same date)
+      { id: 2, sensor: 'VIIRS', lat: 31.0545, lon: 31.3832, year: 2024, date: '2024-10-15', acqTime: '1121', confidence: 'nominal', frp: 5.8 },
+      // Unmatched VIIRS far away (> 10 km) -> VIIRS-ONLY
+      { id: 3, sensor: 'VIIRS', lat: 30.8000, lon: 31.1000, year: 2024, date: '2024-10-15', acqTime: '1125', confidence: 'low', frp: 3.1 },
+      // Temporal mismatch: MODIS & VIIRS same spot but 12 hours apart (> 360 min) -> NOT FORCED TO MATCH
+      { id: 4, sensor: 'MODIS', lat: 30.7200, lon: 31.5000, year: 2024, date: '2024-10-16', acqTime: '0100', confidence: 'nominal', frp: 11.0 },
+      { id: 5, sensor: 'VIIRS', lat: 30.7205, lon: 31.5005, year: 2024, date: '2024-10-16', acqTime: '1330', confidence: 'high', frp: 7.4 }
+    ];
+    const m = computeCrossSensorMatching(sample, { maxDistKm: 1.5, maxMinutes: 360 });
+    assertEqual(m.matchedModis, 1, 'Only Pair A MODIS should match');
+    assertEqual(m.matchedViirs, 2, 'Both Pair A VIIRS cluster detections within 1.5 km should corroborate');
+    assertEqual(m.modisOnly, 1, 'Temporal-mismatch MODIS should remain unmatched (MODIS-only)');
+    assertEqual(m.viirsOnly, 2, 'Far VIIRS + temporal-mismatch VIIRS should remain VIIRS-only');
+    assertEqual(m.duplicateCount, 1, 'Should flag 1 same-sensor near-duplicate (<0.5 km)');
+    assertEqual(m.confidenceBreakdown.high, 2);
+    assertEqual(m.confidenceBreakdown.nominal, 3);
+    assertEqual(m.confidenceBreakdown.low, 1);
+  });
+
+  test('parseFIRMSCSV preserves acqTime and normalized confidence for MODIS and VIIRS', () => {
+    const csv = [
+      'latitude,longitude,acq_date,acq_time,satellite,instrument,confidence,frp',
+      '31.0500,31.3800,2024-10-15,1120,N,VIIRS,h,8.4',
+      '31.0510,31.3810,2024-10-15,1105,Aqua,MODIS,84,16.2'
+    ].join('\n');
+    const { parsed } = parseFIRMSCSV(csv);
+    assertEqual(parsed.length, 2);
+    assertEqual(parsed[0].acqTime, '1120');
+    assertEqual(parsed[0].confidence, 'high');
+    assertEqual(parsed[1].acqTime, '1105');
+    assertEqual(parsed[1].confidence, 'high');
+  });
+
   /* ── Render Results ── */
   const passed = results.filter(r => r.pass).length;
   const failed = results.length - passed;

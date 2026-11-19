@@ -30,7 +30,7 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / 'data' / 'raw' / 'firms'
 OUTPUT = ROOT / 'data' / 'processed'
 BASE = 'https://firms.modaps.eosdis.nasa.gov'
