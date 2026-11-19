@@ -11,7 +11,7 @@ Only the runtime web assets need to be published (documentation and git metadata
 ```text
 index.html
 assets/
-  ├── logo.svg
+  ├── firms-harmony-icon.png
   └── nile-night.jpg
 css/
   └── styles.css
@@ -24,9 +24,11 @@ js/
   ├── i18n.js
   ├── map.js
   ├── methodology.js
+  ├── motion.js
   ├── router.js
   ├── sensors.js
-  └── utils.js
+  ├── utils.js
+  └── verified-firms-data.js
 ```
 
 ---

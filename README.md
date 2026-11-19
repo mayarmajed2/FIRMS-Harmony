@@ -1,400 +1,305 @@
 <div align="center">
-  <img src="assets/banner.svg" alt="Fire Harmony Banner" width="100%">
 
-  <br><br>
+<img src="assets/banner.svg" alt="FIRMS Harmony & Delta Fire Calendar — Animated NASA Space Apps 2026 Banner" width="100%">
 
-  [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-  [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
-  [![JavaScript ES6+](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-  [![Leaflet 1.9.4](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
-  [![Bilingual](https://img.shields.io/badge/i18n-EN%20%7C%20AR%20RTL-1f7a78?style=for-the-badge)](docs/USER_GUIDE.md#language-and-rtl-support)
-  [![Tests](https://img.shields.io/badge/Tests-25%20Passing-3cc9b6?style=for-the-badge)](tests/index.html)
-  [![Verified Archive](https://img.shields.io/badge/NASA%20FIRMS-2000--2025%20(74%20Files)-f08a3c?style=for-the-badge)](data/processed/coverage_summary.csv)
-  [![Zero Build](https://img.shields.io/badge/Build-Zero%20Dependencies-ff5a4a?style=for-the-badge)](docs/INSTALLATION.md)
+<br><br>
 
-  <p>
-    <em>Separating true agricultural burning trends from satellite sensor resolution artifacts across 24 years of Nile Valley and Delta observations.</em>
-  </p>
+[![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps%202026-MODIS%20%26%20VIIRS%20Hot%20Spots-0b3d91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/2026/challenges/modis-and-viirs-hot-spots/)
+[![Verified Archive](https://img.shields.io/badge/NASA%20FIRMS-2000--2025%20(48%20Files)-ff6b1a?style=for-the-badge)](data/processed/coverage_summary.csv)
+[![Held-Out MAE](https://img.shields.io/badge/Held--Out%20MAE-%E2%88%9254.5%25%20Improved-14b8a6?style=for-the-badge)](data/processed/calibration_baseline.csv)
+[![Zero Dependencies](https://img.shields.io/badge/Runtime-Zero%20Dependencies-38bdf8?style=for-the-badge)](#quick-start)
+[![Bilingual SPA](https://img.shields.io/badge/Web%20SPA-EN%20%7C%20AR%20RTL-0d9488?style=for-the-badge)](docs/USER_GUIDE.md)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-Browser%20Suite-c084fc?style=for-the-badge)](tests/index.html)
 
-  <p>
-    <a href="#-project-overview"><strong>Overview</strong></a> &nbsp;•&nbsp;
-    <a href="#-key-features"><strong>Features</strong></a> &nbsp;•&nbsp;
-    <a href="#-system-architecture"><strong>Architecture</strong></a> &nbsp;•&nbsp;
-    <a href="#-installation--setup-guide"><strong>Quick Start</strong></a> &nbsp;•&nbsp;
-    <a href="#-usage-instructions"><strong>Usage</strong></a> &nbsp;•&nbsp;
-    <a href="#-documentation"><strong>Docs</strong></a> &nbsp;•&nbsp;
-    <a href="tests/index.html"><strong>Test Suite</strong></a>
-  </p>
+<h3>
+  <em>Turning 25 years of fragmented NASA MODIS &amp; VIIRS detections into one honest, comparable Nile Delta fire calendar.</em>
+</h3>
+
+<p>
+  <a href="#-live-mission-dashboard"><strong>✨ Live Preview</strong></a> &nbsp;·&nbsp;
+  <a href="#quick-start"><strong>⚡ 60s Launch</strong></a> &nbsp;·&nbsp;
+  <a href="#-why-firms-harmony"><strong>🔥 Why It Matters</strong></a> &nbsp;·&nbsp;
+  <a href="#-interactive-explorers"><strong>🛰️ Interactive Explorers</strong></a> &nbsp;·&nbsp;
+  <a href="#-documentation"><strong>📚 Docs</strong></a>
+</p>
+
 </div>
 
 ---
 
-## 🌍 Project Overview
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <h3>🛰️ 4 Satellites</h3>
+      <sub><strong>Terra · Aqua · S-NPP · NOAA-20</strong><br>Bridging 1 km MODIS &amp; 375 m VIIRS</sub>
+    </td>
+    <td align="center" width="25%">
+      <h3>📅 25+ Years</h3>
+      <sub><strong>2000-11 → 2025-12</strong><br>48 verified Egypt FIRMS archives</sub>
+    </td>
+    <td align="center" width="25%">
+      <h3>📉 −54.5% MAE</h3>
+      <sub><strong>Out-of-sample (2023–2025)</strong><br>Validated against VIIRS S-NPP</sub>
+    </td>
+    <td align="center" width="25%">
+      <h3>⚡ 0 Dependencies</h3>
+      <sub><strong>Python stdlib + Vanilla JS</strong><br>Offline-ready at demo time</sub>
+    </td>
+  </tr>
+</table>
 
-**Fire Harmony** is a lightweight, client-side geospatial web application designed to visualize, analyze, and harmonize thermal active-fire detections along Egypt's **Nile Valley and Delta** corridor (Aswan at `24.0°N` to the Mediterranean coast at `31.6°N`).
-
-The platform brings together two generations of NASA thermal-infrared Earth observation instruments—**MODIS** (1 km nadir resolution, active since 2000) and **VIIRS** (375 m I-band nadir resolution, active since 2012)—in an interactive single-page application. Rather than merging raw fire counts across instruments, Fire Harmony explicitly separates MODIS and VIIRS observations, quantifies cross-sensor overlap ratios, filters detections to the fertile Nile corridor polygon, and allows analysts to upload their own standard **NASA FIRMS CSV** exports directly in the browser.
-
----
-
-## 🔥 The Problem It Solves
-
-Long-term wildfire and agricultural burning studies routinely span more than two decades, bridging the **MODIS era (2000–present)** and the **VIIRS era (2012–present)**. However, naively concatenating or summing raw detection counts across both sensors produces a severe **2012 sensor transition artifact**:
-
-- **Resolution Disparity:** One MODIS `1 km` pixel covers roughly the same ground footprint as **~7 VIIRS `375 m` pixels**.
-- **Sub-Pixel Thermal Dilution:** Small, brief agricultural residue burns (such as rice-straw fires in the Nile Delta) frequently fall below MODIS's thermal detection threshold, while VIIRS resolves them clearly—producing **~3–5× more detections** over the exact same landscape without any real increase in burning.
-- **Background Contamination:** Unclipped regional fire archives for Egypt include desert oil/gas flares and industrial thermal anomalies outside the cultivated Nile corridor.
-
-**Fire Harmony** addresses these challenges by keeping sensor streams strictly disaggregated, computing empirical overlap calibration ratios (`2012–2024`), enforcing a calibrated Nile corridor boundary polygon, and presenting Fire Radiative Power (FRP) alongside detection counts.
-
----
-
-## ✨ Key Features
-
-- **🗺️ Interactive Nile Corridor GIS Map (`#map`)**
-  - Dark-themed Leaflet 1.9.4 map constrained to the Nile Valley and Delta boundary (`BOUNDARY` polygon + `NILE_LINE` and `DELTA_LINES` overlays).
-  - Real-time filtering by sensor (`MODIS`, `VIIRS`), year window (`2001–2024`), and minimum Fire Radiative Power (`0–60 MW`).
-  - Distinct visual encoding: squares (`■`) for MODIS, circles (`●`) for VIIRS, shaded along a 6-step thermal FRP color ramp.
-  - Yearly time-lapse playback (`1.3 s/year`, automatically respecting `prefers-reduced-motion`).
-  - Clickable marker inspection with nearby-detection density count (within `~0.1° ≈ 11 km`) and one-click filtered CSV export.
-
-- **📊 Native SVG Analytics & Harmonization Dashboard (`#analytics`)**
-  - Six live KPI cards: Total Detections, Mean FRP, Median FRP, Peak Month, Years of Record, and Harmonized MODIS Linear Trend (ordinary least squares slope in detections/year).
-  - Three zero-dependency inline SVG visualizations: **Yearly Stacked Activity** (with explicit 2012 transition marker), **Monthly Seasonality** (highlighting the Oct–Dec rice-straw peak), and **FRP Distribution Histogram** (with median reference line).
-  - **Nile Delta Agricultural Burning Calendar** aligning fire cycles with Egyptian crop phenology (autumn rice straw, spring wheat stubble, summer growing minimum).
-  - **Empirical Cross-Sensor Harmonization Matrix** computing overlap count ratio ($R_{\text{count}}$), MODIS/VIIRS mean FRP, and mean intensity ratio ($\alpha$) across `2012–2024`.
-  - **Spatiotemporal Correspondence & Confidence Normalization Engine:** Non-destructively classifies detections into **Corroborated Agreement** (`MODIS ↔ VIIRS` within `≤ 1.5 km` Haversine distance and `≤ 6 h` UTC overpass tolerance), **VIIRS-Only** (sub-pixel), and **MODIS-Only** (overpass/cloud disagreement), flags same-sensor near-duplicates (`< 0.5 km`), and normalizes MODIS numeric confidence (`0–100%`) alongside VIIRS categorical confidence (`l`/`n`/`h`).
-
-- **📂 Client-Side NASA FIRMS CSV Ingestion**
-  - Upload standard NASA FIRMS CSV exports (`MOD14`/`MYD14` MODIS or `VNP14IMGTDL`/`VJ114IMGTDL` VIIRS) directly from the Analytics view.
-  - Automatic ray-casting point-in-polygon clipping against the Nile corridor boundary with live feedback on loaded and excluded detections.
-  - Instant cross-view synchronization via a custom `dataupdated` browser event bus, with one-click reset to the calibrated benchmark dataset.
-
-- **🛰️ Sensor Physics & Scientific Methodology Views (`#sensors`, `#methodology`)**
-  - Side-by-side MODIS vs. VIIRS instrument specifications, overlap bar chart, and sub-pixel resolution geometry diagram.
-  - Six-stage SVG data processing pipeline, FRP radiometric formulation (Wooster et al., 2003), peer-reviewed citations, and explicit scientific limitations disclosure.
-
-- **🛰️ Integrated Real NASA FIRMS Egypt Archive & Python Pipeline (2000–2025)**
-  - Includes real, out-of-sample validated processed outputs from **74 official NASA FIRMS annual archive files** (`Terra`, `Aqua`, `VIIRS S-NPP`, `VIIRS NOAA-20`, spanning `2000-11` to `2025-12`) under [`data/processed/`](data/processed/).
-  - Reproducible Python ETL & validation pipeline in [`pipeline/firms_pipeline.py`](pipeline/firms_pipeline.py) and [`pipeline/app.py`](pipeline/app.py).
-  - Rendered live inside `#analytics` via [`js/verified-firms-data.js`](js/verified-firms-data.js): continuous `2001–2025` raw vs. harmonized VIIRS-equivalent SVG series and 36-month held-out MAE/bias validation (`Terra` MAE `-54.4%`, `Aqua` MAE `-54.5%`).
-
-- **🌐 Bilingual Interface (English LTR & Arabic RTL)**
-  - Instant switching between English (`en`, `dir="ltr"`) and Arabic (`ar`, `dir="rtl"`) with `localStorage` persistence (`fh-lang`), Cairo Arabic typography, and mirrored RTL layout controls.
+> [!IMPORTANT]
+> **Scientific Honesty First:** A satellite **hotspot detection is not a confirmed fire incident**. This project reports thermal detections, input completeness, out-of-sample rescaling accuracy, and explicit caveats—never invented data for missing months (`2026` is explicitly marked **Missing**) and never unvalidated scaling on custom boxes.
 
 ---
 
-## 🌱 Why This Project Matters
+## ✨ Live Mission Dashboard
 
-Over **95% of Egypt's population** (90+ million people) and nearly all of its irrigated farmland are concentrated along a narrow `~35,000 km²` fertile ribbon stretching from Aswan to the Mediterranean Sea. Seasonal post-harvest crop residue burning—especially autumn rice-straw combustion across Dakahlia, Sharqia, Gharbia, and Kafr El-Sheikh—is a well-documented contributor to regional smoke and air-quality episodes.
+<div align="center">
+  <img src="assets/delta-fire-calendar-preview.png" alt="Delta Fire Calendar — NASA Deep Space, Thermal Fire &amp; Nile Delta Interactive UI" width="100%">
+  <br>
+  <sub><strong>Delta Fire Calendar (<code>pipeline/app.py</code> + <code>web/</code>):</strong> True North-Up 0.25° Nile Delta grid with animated Rosetta &amp; Damietta river branches, gliding polar-orbit satellite sweep, one-click <code>Terra / Aqua / S-NPP / NOAA-20</code> isolation, Time-Lapse player, and prior-year anomaly baseline.</sub>
+</div>
 
-Evaluating whether agricultural burning policies are succeeding requires **consistent multi-decadal baselines**. Fire Harmony provides an accessible, transparent tool for researchers, students, environmental analysts, and citizens to inspect active-fire trends without being misled by satellite instrument transitions.
+### What Makes It Shine
 
----
-
-## 🏗️ System Architecture
-
-Fire Harmony uses an **event-driven, client-side Single-Page Application (SPA)** architecture with zero build step and zero backend server requirements.
-
-```mermaid
-flowchart TD
-    subgraph Data["Data & Spatial Engine (js/data.js)"]
-        CSV["NASA FIRMS CSV Upload"] --> PARSER["parseFIRMSCSV()"]
-        BENCH["Deterministic Benchmark Model\n(2001–2024, Park-Miller PRNG)"] --> STORE["Active DATA Store"]
-        PARSER -->|"Ray-Casting Filter\ninside(lat, lon)"| STORE
-        STORE --> CALIB["computeHarmonizationCalibration()\n(2012–2024 Overlap)"]
-    end
-
-    subgraph Events["Browser Event Bus"]
-        STORE -->|"CustomEvent"| EVT_DATA["dataupdated"]
-        I18N["i18n Engine (js/i18n.js)\nEN (LTR) / AR (RTL)"] -->|"Event"| EVT_LANG["langchange"]
-        ROUTER["Hash Router (js/router.js)\n#home #map #analytics ..."]
-    end
-
-    subgraph Views["Presentation Modules"]
-        EVT_DATA --> HOME["Home KPIs & Hero SVG\n(js/home.js, js/hero.js)"]
-        EVT_DATA --> MAP["Leaflet GIS Map & Export\n(js/map.js)"]
-        EVT_DATA --> ANALYTICS["SVG Charts & Harmonization UI\n(js/analytics.js)"]
-        CALIB --> ANALYTICS
-        EVT_LANG --> HOME
-        EVT_LANG --> MAP
-        EVT_LANG --> ANALYTICS
-        EVT_LANG --> SENSORS["Sensor Comparison\n(js/sensors.js)"]
-        EVT_LANG --> METHOD["Methodology & Pipeline\n(js/methodology.js)"]
-        ABOUT["About View\n(js/about.js)"]
-    end
-```
-
-For a deeper technical breakdown of script loading order, DOM lifecycles, and event flows, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+| Experience | What You Can Do |
+| :--- | :--- |
+| **🗺️ North-Up Nile Delta Spatial Grid** | Explore `96` (`0.25°`) grid cells over `29.50–32.50°E, 29.80–31.65°N` with toggleable **Nile River & Mediterranean Coast overlay**, animated polar satellite ground-track, hover telemetry tooltips, and **drag-to-draw custom rectangles** (raw counts enforced). |
+| **🛰️ One-Click Satellite Isolation** | Click **`Terra`**, **`Aqua`**, **`S-NPP`**, or **`NOAA-20`** right in the command bar to isolate any instrument—or click **`Harmonised`** to view the continuous multi-era S-NPP-equivalent series. |
+| **🎬 Interactive Time-Lapse Player** | Press **`▶ Play`** (or `Space`) to animate the Nile Delta **year-by-year** for the same calendar month (`2001 → 2025`) or **month-by-month** at `1×` / `2×` speed, with `←` / `→` keyboard stepping. |
+| **⚖️ Aqua vs. S-NPP Sensor Disagreement** | Inspect per-cell UTC calendar-day pairing (`Aqua only`, `S-NPP only`, `Both`), animated breakdown bars, unsigned disagreement share (`88.4%` in Sep 2023), one-click cross-check query copy, and CSV export. |
+| **🌍 Dual-Mode Bilingual SPA (`index.html`)** | Open `index.html` directly (or deploy on GitHub Pages) for the **English / Arabic RTL** Leaflet GIS map, client-side NASA FIRMS CSV uploader, Haversine cross-sensor matcher, and FRP physics explorer. |
 
 ---
 
-## 🛠️ Technology Stack
+<a id="quick-start"></a>
+## ⚡ 60-Second Quick Start
 
-| Layer | Technology | Role in Fire Harmony |
-| :--- | :--- | :--- |
-| **Markup & Layout** | HTML5, CSS3 Custom Properties, Grid & Flexbox | Semantic SPA shell, dark thermal theme, responsive breakpoints, RTL support |
-| **Application Logic** | Vanilla JavaScript (ES6+) | Spatial ray-casting, CSV parser, statistics, routing, and DOM rendering |
-| **Interactive Mapping** | [Leaflet 1.9.4](https://leafletjs.com/) (via cdnjs) | Interactive slippy map, polygon/polyline overlays, custom `divIcon` markers |
-| **Map Basemap** | [CARTO Dark Matter](https://carto.com/attributions) / OpenStreetMap | Dark raster tile basemap for high-contrast thermal marker legibility |
-| **Data Visualization** | Native Inline SVG | Stacked yearly bars, grouped monthly bars, FRP histogram, overlap & pixel diagrams |
-| **Typography** | Google Fonts (`Fraunces`, `DM Sans`, `Cairo`) | Editorial display headings, UI copy, and full Arabic script rendering |
-| **State & Persistence** | Browser DOM Events & `localStorage` | Reactive cross-module updates (`dataupdated`, `langchange`) and language preference |
-
----
-
-## ⚙️ How It Works
-
-### 1. Spatial Boundary Clipping (`js/data.js`)
-Every detection coordinate `(lat, lon)`—whether procedurally generated for the benchmark model or parsed from an uploaded NASA FIRMS CSV—is tested against a 25-vertex polygon (`BOUNDARY`) enclosing the fertile Nile Valley and Delta (`24.0°N–31.6°N`, `30.2°E–33.1°E`) using a **ray-casting point-in-polygon algorithm** (`inside(lat, lon)`). Points outside this corridor are excluded.
-
-### 2. Cross-Sensor Harmonization (`computeHarmonizationCalibration`)
-Over the co-observation baseline (`2012–2024`), Fire Harmony computes three empirical metrics to quantify sensor divergence:
-
-- **Count Inflation Ratio:** $R_{\text{count}} = \dfrac{N_{\text{VIIRS}}}{N_{\text{MODIS}}}$
-- **Total Radiative Energy Ratio:** $R_{\text{FRP}} = \dfrac{\sum \text{FRP}_{\text{VIIRS}}}{\sum \text{FRP}_{\text{MODIS}}}$
-- **Mean Intensity Ratio:** $\alpha = \dfrac{\overline{\text{FRP}}_{\text{VIIRS}}}{\overline{\text{FRP}}_{\text{MODIS}}}$
-
-Long-term linear trend estimation on the Analytics dashboard uses **MODIS-only** annual counts (`2001–2024`) via ordinary least squares regression so that the 2012 VIIRS introduction does not bias the multi-decadal slope.
-
-### 3. Radiometric Formulation
-Fire Radiative Power (MW) follows the mid-infrared (MIR ~4 µm) formulation of Wooster et al. (2003):
-
-$$\text{FRP} = \frac{A_{\text{pix}} \cdot \sigma}{a} \left(T_4^4 - T_{4,\text{bg}}^4\right)$$
-
-On the interactive map, FRP values are mapped onto a 6-step thermal ramp (`#3b1d7a` → `#fff3c4`) using a square-root perceptual scale (`Math.sqrt(frp / 60)`).
-
----
-
-## 📁 Project Structure
-
-```text
-FIRMS-Harmony/
-├── index.html                  # Single-page application shell & script manifest
-├── README.md                   # Project overview & quick start
-├── CHANGELOG.md                # Version history
-├── CONTRIBUTING.md             # Contributor workflow & standards
-├── .gitignore                  # Git ignore rules
-├── assets/
-│   ├── banner.svg              # Wide vector hero banner for repository presentation
-│   ├── logo.svg                # Vector brand emblem & SVG favicon
-│   └── nile-night.jpg          # NASA Earth Observatory nighttime Nile backdrop
-├── css/
-│   └── styles.css              # Design tokens, layout, responsive & RTL styles
-├── data/
-│   └── processed/              # Real NASA FIRMS Egypt (2000–2025) validated CSV outputs
-├── pipeline/
-│   ├── firms_pipeline.py       # Python ETL, spatial clipping & out-of-sample calibration pipeline
-│   └── app.py                  # Dependency-free Python API & server for Delta Fire Calendar (port 8000)
-├── web/                        # Delta Fire Calendar interactive NASA × Fire × Nile Delta UI
-│   ├── index.html              # Mission dashboard shell & animated orbital emblem
-│   ├── styles.css              # NASA deep space × thermal fire × Nile emerald responsive design
-│   └── app.js                  # North-up Nile Delta map, Terra/Aqua/S-NPP/NOAA-20 controls, time-lapse & audit
-├── js/
-│   ├── utils.js                # Shared DOM, HTML-escaping & CSV-sanitization helpers
-│   ├── i18n.js                 # EN/AR dictionary, RTL switcher & langchange event
-│   ├── data.js                 # Nile polygon, benchmark generator, FIRMS CSV parser & calibration
-│   ├── verified-firms-data.js  # Real 2000–2025 NASA FIRMS harmonized archive data for SPA
-│   ├── hero.js                 # Animated abstract Nile SVG illustration
-│   ├── home.js                 # Dynamic Home KPI counters
-│   ├── map.js                  # Leaflet GIS map, filters, time-lapse & CSV export
-│   ├── analytics.js            # SVG charts, burning calendar, harmonization matrix & CSV uploader
-│   ├── sensors.js              # MODIS vs. VIIRS comparison & sub-pixel physics diagrams
-│   ├── methodology.js          # Data pipeline SVG, equations, citations & limitations
-│   ├── about.js                # Mission, objectives, study area & data source links
-│   └── router.js               # Hash-based SPA routing (#home, #map, #analytics, ...)
-└── docs/
-    ├── ARCHITECTURE.md         # System architecture, modules & event bus
-    ├── INSTALLATION.md         # Setup, local servers & verification
-    ├── USER_GUIDE.md           # Complete feature walkthrough
-    ├── DATA_DOCUMENTATION.md   # Schemas, synthetic model & FIRMS CSV format
-    ├── DEVELOPMENT.md          # Development workflow & coding standards
-    ├── DEPLOYMENT.md           # Static hosting & production deployment
-    └── FAQ.md                  # Troubleshooting & common questions
-└── tests/
-    └── index.html              # Browser-runnable unit & adversarial test suite
-```
-
----
-
-## 🚀 Installation & Setup Guide
-
-Fire Harmony requires **no build tools, package managers, or backend servers**.
-
-### Option 1: Open Directly in a Browser
 ```bash
 git clone https://github.com/mayarmajed2/FIRMS-Harmony.git
 cd FIRMS-Harmony
 ```
-Open `index.html` directly in any modern browser (Chrome, Edge, Firefox, or Safari).
 
-### Option 2: Run the Static SPA Locally (Recommended for `index.html`)
-Serving over HTTP avoids browser restrictions on local file origins and matches GitHub Pages deployment:
+Choose how you want to run it—**both work with zero `npm install` and zero pip packages:**
 
-```bash
-# Using Python 3
-python -m http.server 8080
+<table>
+  <thead>
+    <tr>
+      <th align="left">Mode</th>
+      <th align="left">Command</th>
+      <th align="left">Best For</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>🔥 Delta Fire Calendar</strong><br><sub>Full 2000–2025 Local Archive Server</sub></td>
+      <td><code>python pipeline/app.py</code><br>Open <a href="http://127.0.0.1:8000"><code>http://127.0.0.1:8000</code></a></td>
+      <td>Full 48-file Nile Delta calendar, <code>Terra/Aqua/S-NPP/NOAA-20</code> buttons, North-Up Nile map, disagreement grid, validation audit &amp; CSV exports. <strong>100% offline.</strong></td>
+    </tr>
+    <tr>
+      <td><strong>🌍 FIRMS Harmony SPA</strong><br><sub>Static Bilingual EN/AR Web App</sub></td>
+      <td><code>python -m http.server 8080</code><br>Open <code>http://localhost:8080</code></td>
+      <td>GitHub Pages static hosting, Leaflet Nile corridor GIS map, live browser NASA FIRMS CSV upload &amp; Arabic RTL mode.</td>
+    </tr>
+  </tbody>
+</table>
 
-# Or using Node.js (npx)
-npx serve . -l 8080
+> [!TIP]
+> **Direct Demo Deep Link** (once `python pipeline/app.py` is running):
+> ```text
+> http://127.0.0.1:8000/?area=full&year=2023&month=9&scale=harmonized&platform=snpp
+> ```
+> **Keyboard Shortcuts inside Delta Fire Calendar:** `←` / `→` step time · `Space` play/pause time-lapse · `R` reset to Sep 2023 Demo view.
+
+---
+
+## 🔥 Why FIRMS Harmony?
+
+Over **95% of Egypt's population** lives along the fertile Nile Valley and Delta, where seasonal post-harvest crop-residue burning (especially autumn rice-straw burning in **Dakahlia, Sharqia, Gharbia, and Kafr El-Sheikh**) drives major air-quality episodes.
+
+Tracking multi-decade burning trends requires bridging **MODIS (2000–present, 1 km pixel)** and **VIIRS (2012–present, 375 m pixel)**. Simply merging raw hotspot counts creates a massive **2012 sensor artifact**: VIIRS detects **~18–19× more hotspots** per month over the Nile Delta than MODIS because small agricultural fires fall below MODIS's 1 km thermal threshold.
+
+**FIRMS Harmony** solves this transparently—fitting out-of-sample multiplicative rescaling factors (`2013–2022` train, `2023–2025` held-out test), exposing where calibration succeeds vs. fails (`NOAA-20`), separating true zeros from missing archives (`2026`), and visualizing exact cell-day sensor disagreement.
+
+---
+
+## 🛰️ Interactive Explorers
+
+Click any section below to expand live verified metrics, judge scenarios, system architecture, and reproduction checks:
+
+<details open>
+<summary><strong>🛰️ Satellite Constellation &amp; Out-of-Sample Calibration Results (2013–2022 Train · 2023–2025 Test)</strong></summary>
+
+<br>
+
+| Platform | Resolution | Verified Archive | Complete Months | Calibration Factor | Held-Out MAE (Raw → Calibrated) | Held-Out Bias | Verdict |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **MODIS Terra** | `1 km` | `2000-11 → 2025-12` | `302` | **`×18.389`** | `309.75` → **`141.17`** (`−54.4%`) | `−309.75` → `−17.51` | ✅ **MAE Improved** |
+| **MODIS Aqua** | `1 km` | `2002-07 → 2025-12` | `282` | **`×19.226`** | `308.67` → **`140.32`** (`−54.5%`) | `−308.67` → `+17.38` | ✅ **MAE Improved** |
+| **VIIRS S-NPP** | `375 m` | `2012-02 → 2025-12` | `167` | **`×1.000`** *(Ref)* | *Reference Scale* | `0.00` | 🎯 **Reference** |
+| **VIIRS NOAA-20** | `375 m` | `2018-04 → 2025-12` | `93` | `×1.015` *(Rejected)* | `28.86` → **`30.43`** (`+5.4%`) | `+14.03` → `+18.99` | ⚠️ **Kept Raw** |
+
+<sub>All metrics are generated deterministically by <code>pipeline/firms_pipeline.py</code> from <code>224,415</code> Delta bounding-box rows (<code>109,893</code> eligible <code>type=0</code> Standard Processing rows).</sub>
+
+</details>
+
+<details>
+<summary><strong>🔥 5 Judge-Ready Verified Demo Scenarios (Built into the UI Dropdown)</strong></summary>
+
+<br>
+
+| Scenario | Parameters | Verified Headline | Why Judges Love It |
+| :--- | :--- | :--- | :--- |
+| **1. Sep 2023 Demo** | `Full Delta · 2023-09 · Harmonised` | **`1,588`** (`+9.9%` vs median `1,446`, `30/30` days) | Complete observed month; map cell sum (`1,588`) matches raw CSV row count identically; peak disagreement cell `30.88°N, 31.63°E` = `1 / 19 / 9 / 29`. |
+| **2. Oct 2023 Contrast** | `Full Delta · 2023-10 · Harmonised` | **`1,684`** (`−21.8%` vs median `2,154`) | Proves the calendar surfaces below-median autumn months honestly—no cherry-picking. |
+| **3. West Delta Sign Flip** | `Western Delta · 2023-09 · Harmonised` | **`226`** (`+33.6%` full vs **`−14.7%`** S-NPP-only median `265`) | Automatically detects when mixed extrapolated MODIS + observed S-NPP years flip the anomaly sign and plots **both** dashed medians! |
+| **4. NOAA-20 Guardrail** | `Full Delta · 2023-09 · Raw · NOAA-20` | **`1,536`** (`+151.0%` vs median `612`) | Displays explicit **`Raw only`** + **`Calibration failed`** badges because NOAA-20 worsened held-out MAE (`+5.4%`). |
+| **5. 2026 Missing Input** | `Full Delta · 2026-09 · Harmonised` | **`Missing`** (`0%` completeness · Map overlay) | Never invents a fake zero when local archive input is absent. |
+
+</details>
+
+<details>
+<summary><strong>🏗️ Dual-App System Architecture (Mermaid Diagram)</strong></summary>
+
+<br>
+
+```mermaid
+flowchart LR
+    subgraph Archive["NASA FIRMS Egypt Archive (2000–2025)"]
+        RAW["48 Annual Egypt CSVs<br/>Terra · Aqua · S-NPP · NOAA-20"] --> ETL["pipeline/firms_pipeline.py<br/>Filter · Grid 0.25° · Calibrate · Audit"]
+        ETL --> PROC["data/processed/*.csv<br/>area_monthly · grid_monthly<br/>sensor_disagreement · calibration_*"]
+    end
+
+    subgraph Server["Delta Fire Calendar (Offline Local App)"]
+        PROC --> API["pipeline/app.py<br/>Stdlib HTTP API + Static Server (:8000)"]
+        API --> WEB["web/ (index.html · styles.css · app.js)<br/>North-Up Nile Map · Time-Lapse · Satellite Controls"]
+    end
+
+    subgraph StaticSPA["FIRMS Harmony SPA (GitHub Pages)"]
+        PROC -.-> VDATA["js/verified-firms-data.js"]
+        VDATA --> SPA["index.html + css/ + js/<br/>Bilingual EN/AR · Leaflet GIS · CSV Upload"]
+    end
 ```
-Then open `http://localhost:8080` in your browser.
 
-### Option 3: Launch the Interactive Delta Fire Calendar Server (`pipeline/app.py` + `web/`)
-Run the dependency-free Python 3.10+ backend over the full verified 2000–2025 NASA FIRMS Nile Delta archive (`data/processed/`):
+</details>
 
-```bash
-python pipeline/app.py
-```
-Then open `http://127.0.0.1:8000` (or jump straight to the verified September 2023 demo view: `http://127.0.0.1:8000/?area=full&year=2023&month=9&scale=harmonized&platform=snpp`).
+<details>
+<summary><strong>🧪 10-Second Scientific Reproduction &amp; Verification Commands</strong></summary>
 
-**Highlights of the Delta Fire Calendar (`web/`):**
-- **True North-Up Nile Delta Spatial Grid (`0.25°`)** with animated Nile River, Rosetta & Damietta branches, Mediterranean coastline, orbital satellite sweep track, city landmarks, and drag-to-select custom rectangles.
-- **Interactive Satellite Isolation (`Terra`, `Aqua`, `S-NPP`, `NOAA-20`)** alongside Harmonised and S-NPP Reference Era scales, plus one-click verified judge scenarios and **Time-Lapse playback** (`Yearly` / `Monthly`, `1×` / `2×`, keyboard shortcuts `←` `→` `Space` `R`).
-- **Aqua vs. S-NPP Detection Disagreement Grid**, full 27-year (`2000–2026`) monthly calendar matrix, out-of-sample MAE/bias validation tables, and CSV evidence downloads.
+<br>
 
-See [docs/INSTALLATION.md](docs/INSTALLATION.md) for browser compatibility, network requirements, and verification steps.
+Verify every headline number straight from the committed `data/processed/` files:
 
----
+```powershell
+# 1. Verify September 2023 Full Delta headline count (expected: ['1588.0'])
+python -c "import csv; r=list(csv.DictReader(open('data/processed/area_monthly.csv',encoding='utf-8-sig'))); print([x['harmonized_hotspots'] for x in r if x['area_id']=='full' and x['month']=='2023-09' and x['platform']=='snpp'])"
 
-## 🔧 Configuration & Environment Variables
+# 2. Verify peak disagreement cell 30.88°N, 31.63°E (expected: aqua_only=1, snpp_only=19, both=9 -> total 29)
+python -c "import csv; r=[x for x in csv.DictReader(open('data/processed/sensor_disagreement.csv',encoding='utf-8-sig')) if x['month']=='2023-09' and float(x['west'])==31.5 and float(x['south'])==30.75]; print([(x['observed_in'], x['cell_days']) for x in r])"
 
-Fire Harmony runs entirely in the browser and **does not require any `.env` files, API keys, or server-side configuration**.
-
-| Mechanism | Key / Endpoint | Purpose |
-| :--- | :--- | :--- |
-| **`localStorage`** | `fh-lang` | Persists the user's selected language (`en` or `ar`) across sessions |
-| **External CDN** | `cdnjs.cloudflare.com` (Leaflet 1.9.4) | Loads interactive GIS mapping library and stylesheet |
-| **Tile Server** | `basemaps.cartocdn.com` (CARTO Dark Matter) | Serves dark cartographic raster basemap tiles |
-| **Font CDN** | `fonts.googleapis.com` | Loads `Fraunces`, `DM Sans`, and `Cairo` fonts |
-
-> **Note:** Core analytics, SVG charts, and NASA FIRMS CSV parsing operate fully client-side without network calls. An internet connection is only required to fetch Leaflet, CARTO basemap tiles, and Google Fonts from their CDNs.
-
----
-
-## 📖 Usage Instructions
-
-1. **Explore the Overview (`#home`):** Review dynamically computed dataset metrics and the animated Nile corridor overview.
-2. **Inspect the GIS Map (`#map`):**
-   - Toggle **MODIS** and **VIIRS** checkboxes to compare spatial density.
-   - Adjust the **Observation window** (`2001–2024`) and **Minimum FRP** slider (`0–60 MW`).
-   - Click **▶ Play** to run a year-by-year time-lapse animation.
-   - Click any fire marker to view sensor metadata, coordinates, FRP, and nearby detections within `~11 km`.
-   - Click **⬇ Export Filtered CSV** to download the active filtered subset.
-3. **Analyze Trends & Upload Real NASA FIRMS Data (`#analytics`):**
-   - Inspect yearly trends, monthly seasonality, FRP distribution, the Nile Delta burning calendar, and the 2012–2024 harmonization matrix.
-   - Click **📂 Upload FIRMS CSV** to load a CSV exported from [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/download/). Detections outside the Nile boundary are automatically excluded, and the Home, Map, and Analytics views refresh immediately.
-   - Click **🔄 Reset to Calibrated Benchmark** to restore the default dataset.
-4. **Compare Sensors & Methodology (`#sensors`, `#methodology`):** Examine instrument specs, sub-pixel geometry, radiometric formulas, and peer-reviewed citations.
-5. **Switch Languages:** Click **العربية / English** in the top navigation bar at any time to toggle full RTL/LTR directionality.
-
-For detailed walkthroughs, see [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
-
----
-
-## 🧪 Examples & Expected Outputs
-
-### Sample Input: NASA FIRMS CSV Upload
-`parseFIRMSCSV()` accepts standard NASA FIRMS CSV files containing at least `latitude` (or `lat`), `longitude` (or `lon`), and `acq_date` (or `date`), plus optional `frp` and `satellite`/`instrument`/`sensor` columns:
-
-```csv
-latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_t31,frp,daynight
-31.0421,31.3784,321.4,0.42,0.38,2023-10-18,1132,N20,VIIRS,n,2.0NRT,298.1,6.4,D
-30.8812,31.0125,314.8,1.05,1.02,2023-10-19,1115,Aqua,MODIS,78,6.1,296.4,11.2,D
-27.5000,26.1000,335.0,0.45,0.40,2023-10-19,1120,N20,VIIRS,n,2.0NRT,301.2,18.5,D
+# 3. Verify 2026 is explicitly marked missing (never a fake zero)
+python -c "import csv; r=list(csv.DictReader(open('data/processed/area_monthly.csv',encoding='utf-8-sig'))); print([(x['estimate_status'],x['input_status']) for x in r if x['area_id']=='full' and x['month']=='2026-09' and x['platform']=='snpp'])"
 ```
 
-**Expected Processing Result:**
-- Rows 1 & 2 fall inside the Nile Delta boundary and are retained (`VIIRS` and `MODIS` respectively).
-- Row 3 (`27.50°N, 26.10°E`, Western Desert) falls outside `BOUNDARY` and is excluded (`skippedOutside = 1`).
-- UI status reports: `✅ Successfully loaded 2 detections (1 outside boundary excluded).`
+</details>
 
-### Sample Output: Filtered CSV Export (`#map`)
-Clicking **⬇ Export Filtered CSV** downloads `fire_harmony_nile_detections_YYYY-MM-DD.csv`:
+<details>
+<summary><strong>📁 Clean Repository Structure</strong></summary>
 
-```csv
-id,sensor,latitude,longitude,date,year,frp_mw
-0,VIIRS,31.0421,31.3784,2023-10-18,2023,6.4
-1,MODIS,30.8812,31.0125,2023-10-19,2023,11.2
+<br>
+
+```text
+FIRMS-Harmony/
+├── README.md                          # Interactive mission overview & quick start
+├── CHANGELOG.md                       # Version history
+├── CONTRIBUTING.md                    # Contributor workflow & standards
+├── .gitignore                         # Clean ignore rules (caches, zips, raw archives)
+│
+├── pipeline/                          # 🔥 Delta Fire Calendar Python Backend & ETL
+│   ├── app.py                         # Zero-dependency HTTP API & static server (port 8000)
+│   └── firms_pipeline.py              # Reproducible FIRMS parser, gridder & calibration audit
+├── web/                               # ✨ Delta Fire Calendar NASA × Fire × Nile Frontend
+│   ├── index.html                     # Mission UI shell & animated orbital SVG emblem
+│   ├── styles.css                     # NASA space × thermal fire × Nile emerald design system
+│   └── app.js                         # North-Up Nile map, satellite toggles, time-lapse & charts
+├── data/processed/                    # 📊 Verified 2000–2025 Processed Outputs (16 canonical files)
+│
+├── index.html                         # 🌍 Static Bilingual (EN/AR) FIRMS Harmony SPA
+├── css/styles.css                     # SPA aerospace theme, responsive & RTL layout
+├── js/                                # Modular ES6 SPA engines (Leaflet map, CSV parser, i18n, motion)
+├── assets/                            # Brand logos, animated SVG banner, preview & Nile backdrop
+├── docs/                              # Architecture, installation, user guide, data schemas & FAQ
+└── tests/index.html                   # Browser-runnable unit & adversarial test suite
 ```
 
----
+</details>
 
-## 🖼️ Visual Identity & Assets
+<details>
+<summary><strong>📐 Calibration &amp; Radiometric Formulation</strong></summary>
 
-| Asset | Preview / Path | Description |
-| :--- | :--- | :--- |
-| **Hero Banner** | [`assets/banner.svg`](assets/banner.svg) | Full-width dark thermal vector banner combining the orbital emblem, MODIS/VIIRS palette, and stylized Nile Delta |
-| **Brand Mark** | [`assets/logo.svg`](assets/logo.svg) | Custom vector emblem combining an orbital satellite track, dual-gradient thermal flame (MODIS ember to VIIRS blaze), and the turquoise Nile corridor |
-| **Cartographic Backdrop** | [`assets/nile-night.jpg`](assets/nile-night.jpg) | NASA Earth Observatory nighttime photography of the Nile Valley and Delta, cropped dynamically per view via CSS |
+<br>
 
----
+- **Cross-Sensor Count Rescaling (Delta Fire Calendar):** For each MODIS instrument $s \in \{\text{Terra}, \text{Aqua}\}$, a scalar multiplicative factor $k_s$ is fitted exclusively on training overlap months (`2013–2022`) to align monthly hotspot totals to the VIIRS S-NPP reference scale, then evaluated out-of-sample on `2023–2025` via Mean Absolute Error (MAE) and mean bias. If held-out MAE worsens (as for `NOAA-20`), raw counts are retained explicitly.
+- **Fire Radiative Power (Wooster et al., 2003):**
 
-## 🛰️ Data Sources & Scientific References
+$$\text{FRP} = \frac{A_{\text{pix}} \cdot \sigma}{a} \left(T_4^4 - T_{4,\text{bg}}^4\right)$$
 
-### Authoritative Satellite Products
-- **NASA FIRMS (Fire Information for Resource Management System):** [firms.modaps.eosdis.nasa.gov](https://firms.modaps.eosdis.nasa.gov/) (`doi:10.5067/FIRMS/data`)
-- **MODIS Collection 6.1 Active Fire:** Terra (`MOD14`) & Aqua (`MYD14`), 1 km nadir resolution
-- **VIIRS 375 m I-Band Active Fire:** Suomi NPP (`VNP14IMG`) & NOAA-20 (`VJ114IMG`), 375 m nadir resolution
-- **NASA Earth Observatory:** ISS nighttime photography of the Nile corridor
+- **Empirical Overlap Ratios (Static SPA):** $R_{\text{count}} = N_{\text{VIIRS}} / N_{\text{MODIS}}$, $R_{\text{FRP}} = \sum \text{FRP}_{\text{VIIRS}} / \sum \text{FRP}_{\text{MODIS}}$, and $\alpha = \overline{\text{FRP}}_{\text{VIIRS}} / \overline{\text{FRP}}_{\text{MODIS}}$.
 
-### Peer-Reviewed Literature Cited
-- Wooster, M. J., Zhukov, B., & Oertel, D. (2003). *Fire radiative energy for quantitative study of biomass burning*. Remote Sensing of Environment, 86(1), 83–107.
-- Schroeder, W., Oliva, P., Giglio, L., & Csiszar, I. A. (2014). *The New VIIRS 375 m Active Fire Detection Data Product*. Remote Sensing of Environment, 143, 85–96.
-- Giglio, L., Schroeder, W., & Justice, C. O. (2016). *An Enhanced Contextual Fire Detection Algorithm for MODIS*. Remote Sensing of Environment, 191, 344–364.
-- El-Metwally et al. (2019). *Agricultural burning in the Nile Delta*.
-- Ramadan et al. (2021). *VIIRS/MODIS comparison for Egyptian Delta*.
+</details>
 
-> **Scientific Transparency:** The default preloaded dataset (`2001–2024`) is a **deterministically seeded, calibrated synthetic model** designed to reproduce published NASA FIRMS spatial, seasonal, and sensor-resolution patterns for the Nile Valley and Delta. Real NASA FIRMS CSV archives can be loaded at any time through the Analytics upload interface.
+<details>
+<summary><strong>⚠️ Scientific Caveats &amp; Limitations Disclosure</strong></summary>
 
----
+<br>
 
-## ⚡ Performance, Accessibility & Reliability
+- **Detections ≠ Confirmed Incidents:** FIRMS active-fire pixels measure mid-infrared thermal anomalies, not verified agricultural burn permits, crop types, or burned-area extent.
+- **MODIS Product Version Shifts (`6.2 → 6.03 → 61.03`):** Collection segment factors shift across archive versions, so pre-2013 calibrated values are explicitly flagged **Extrapolated**.
+- **Detection Disagreement ≠ Sensor Blind Spot:** Without fire-mask products (`MYD14` / `VNP14IMG`), the denominator only includes active cell-days (`aqua_only + snpp_only + both`).
+- **Custom Rectangles Stay Raw:** Local factors vary substantially across the Delta (`15.38` Aqua North to `32.66` Aqua South), so custom drawn boxes always enforce raw counts.
+- **Historical Tool Only:** No fire forecasting or live API polling is performed at demo time; `2026` awaits a local FIRMS archive or `MAP_KEY`.
 
-- **Zero-Bundle Startup:** Pure HTML/CSS/JS with lightweight inline SVGs keeps page loads fast without framework overhead.
-- **Accessibility (a11y):** Includes a skip-to-content link (`#skip`), semantic landmarks (`header`, `nav`, `main`, `aside`, `footer`), `aria-current="page"` navigation states, `aria-live="polite"` status regions, keyboard-focusable map markers, `24px+` touch targets, and `@media (prefers-reduced-motion: reduce)` handling for animations and time-lapse playback.
-- **Graceful Degradation:** If Leaflet cannot load from CDN (e.g., offline), `#mapCanvas` renders a localized fallback message instead of failing silently.
+</details>
 
----
+<details>
+<summary><strong>🖼️ Brand Identity &amp; Visual Assets</strong></summary>
 
-## 🧭 Limitations & Future Improvements
+<br>
 
-### Current Limitations
-- **Default Synthetic Baseline:** Out of the box, Fire Harmony displays a representative synthetic dataset rather than querying a live NASA FIRMS API endpoint (which requires a personal NASA MAP_KEY).
-- **Atmospheric Attenuation:** FRP values represent top-of-atmosphere retrievals without local water-vapor or autumn haze attenuation corrections.
-- **CDN Dependency for Basemap Tiles:** While core analytics, charts, and CSV parsing work offline, Leaflet 1.9.4 and CARTO basemap tiles load from external CDNs.
+| Asset | Preview | Usage |
+| :---: | :---: | :--- |
+| **Animated Banner** | [`assets/banner.svg`](assets/banner.svg) | Animated NASA × Fire × Nile Delta SVG hero banner with polar satellite sweep & flowing river currents |
+| **Primary Lockup** | <img src="assets/firms-harmony-logo.png" alt="FIRMS Harmony Logo" width="160"> | High-resolution FIRMS Harmony orbital emblem & wordmark ([`assets/firms-harmony-logo.png`](assets/firms-harmony-logo.png)) |
+| **App Icon** | <img src="assets/firms-harmony-icon.png" alt="FIRMS Harmony Icon" width="56"> | Favicon & SPA header icon ([`assets/firms-harmony-icon.png`](assets/firms-harmony-icon.png)) |
+| **Nile Night Backdrop** | <img src="assets/nile-night.jpg" alt="ISS Nile Night" width="140"> | NASA Earth Observatory ISS nighttime Nile corridor photography ([`assets/nile-night.jpg`](assets/nile-night.jpg)) |
 
-### Planned Improvements
-- Optional direct NASA FIRMS API integration using user-supplied MAP_KEY credentials.
-- Sub-regional governorate-level polygon clipping and breakdown tables.
-- Automated CI browser test runner using the included [`tests/index.html`](tests/index.html) verification suite.
+</details>
 
 ---
 
 ## 📚 Documentation
 
-Comprehensive technical documentation is available in the [`docs/`](docs/) directory:
-
-| Document | Description |
+| Guide | What's Inside |
 | :--- | :--- |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, module responsibilities, event bus, and rendering pipeline |
-| [docs/INSTALLATION.md](docs/INSTALLATION.md) | Local setup, static server options, browser support, and verification |
-| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | Complete guide to all six views, filtering, CSV upload/export, and RTL switching |
-| [docs/DATA_DOCUMENTATION.md](docs/DATA_DOCUMENTATION.md) | Data schemas, synthetic benchmark parameters, polygon geometry, and FIRMS CSV parsing |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Coding standards, script load order, design tokens, and i18n workflow |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deploying to GitHub Pages, Netlify, Cloudflare Pages, Vercel, or Nginx |
-| [docs/FAQ.md](docs/FAQ.md) | Common questions and troubleshooting |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Event bus, module lifecycles, spatial engine & rendering pipeline |
+| [INSTALLATION.md](docs/INSTALLATION.md) | Local server setup, browser requirements & verification checklist |
+| [USER_GUIDE.md](docs/USER_GUIDE.md) | Step-by-step feature walkthrough, CSV uploads & Arabic RTL mode |
+| [DATA_DOCUMENTATION.md](docs/DATA_DOCUMENTATION.md) | Processed CSV schemas, Nile corridor polygon & FIRMS parsing rules |
+| [DEVELOPMENT.md](docs/DEVELOPMENT.md) | Coding standards, zero-build philosophy & testing workflow |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Hosting on GitHub Pages, Netlify, Cloudflare Pages & Vercel |
+| [FAQ.md](docs/FAQ.md) | Troubleshooting & common scientific questions |
 
 ---
 
-## 🤝 Contributing
+## 🛰️ Data & Literature Credits
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for guidelines on maintaining zero-build architecture, bilingual EN/AR parity, and scientific rigor.
-
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+- **NASA FIRMS Active Fire Data:** [firms.modaps.eosdis.nasa.gov](https://firms.modaps.eosdis.nasa.gov/) (`doi:10.5067/FIRMS/data`) — MODIS Collection 6.x (`MOD14`/`MYD14`) & VIIRS Collection 2 (`VNP14IMG`/`VJ114IMG`).
+- **Challenge:** [NASA Space Apps 2026 — Harmonization of MODIS and VIIRS Hot Spots](https://www.spaceappschallenge.org/2026/challenges/modis-and-viirs-hot-spots/).
+- **References:** Wooster et al. (2003), *Remote Sensing of Environment*; Schroeder et al. (2014), *RSE*; Giglio et al. (2016), *RSE*; El-Metwally et al. (2019); Ramadan et al. (2021).
 
 ---
 
-## 📄 License
-
-No `LICENSE` file is currently included in this repository. Please contact the repository maintainer before redistributing or using this software in commercial or derivative works.
+<div align="center">
+  <sub>Built with 🛰️ NASA Earth Observation data, 🔥 thermal transparency, and 🌊 love for the Nile Delta · <a href="CHANGELOG.md">Changelog</a> · <a href="CONTRIBUTING.md">Contributing</a></sub>
+</div>
