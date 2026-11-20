@@ -83,6 +83,7 @@ if (document.readyState === 'loading') {
 function initMap() {
   if (map) return;
   setupMapUI();
+  initFilters();
 
   if (typeof L === 'undefined') {
     const canvas = $('mapCanvas');
@@ -92,9 +93,12 @@ function initMap() {
 
   map = L.map('mapCanvas', { minZoom: 5, maxZoom: 13 });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles © <a href="https://www.esri.com">Esri</a> · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    opacity: 0.65,
+    interactive: false
   }).addTo(map);
 
   /* Study area polygon boundary */
@@ -390,7 +394,11 @@ function syncYearDropdowns() {
   tlYear = minY;
 }
 
+let filtersInitialized = false;
+
 function initFilters() {
+  if (filtersInitialized) return;
+  filtersInitialized = true;
   syncYearDropdowns();
 
   ['fM', 'fV', 'y0', 'y1', 'frp'].forEach(id => {

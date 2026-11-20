@@ -21,6 +21,7 @@ function route() {
   });
   updateTitle();
   scrollTo({ top: 0, behavior: 'instant' });
+  requestAnimationFrame(() => scrollTo({ top: 0, behavior: 'instant' }));
   if (id === 'home') count();
   if (id === 'map') { initMap(); if (map) map.invalidateSize(); }
 }

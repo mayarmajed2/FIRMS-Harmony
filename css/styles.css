@@ -41,7 +41,7 @@
 }
 
 html {
-  scroll-padding-top: env(safe-area-inset-top, 0px);
+  scroll-padding-top: 88px;
   scroll-behavior: smooth;
 }
 
